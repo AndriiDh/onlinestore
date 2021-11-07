@@ -11,7 +11,7 @@ public class DBManager {
     private static DBManager dbManager;
 
     private DBManager() throws NamingException {
-        source = (DataSource) new InitialContext().lookup("java:/comp/env/jdbc/onlinestore");
+        source = (DataSource) new InitialContext().lookup("java:/comp/env/jdbc/mysql");
     }
     public static synchronized Connection getConnection() throws NamingException, SQLException {
         if (dbManager == null) {
