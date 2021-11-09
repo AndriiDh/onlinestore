@@ -1,15 +1,15 @@
 package org.onlinestore.entity;
 
 import java.io.Serializable;
+import java.util.Date;
 
 public class Item implements Serializable {
     private int id;
     private String title;
-    private String description;
     private double price;
-    private String category;
+    private Category category;
     private int amount;
-    private String addedAt;
+    private Date addedAt;
 
     public int getId() {
         return id;
@@ -27,14 +27,6 @@ public class Item implements Serializable {
         this.title = title;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public double getPrice() {
         return price;
     }
@@ -43,11 +35,11 @@ public class Item implements Serializable {
         this.price = price;
     }
 
-    public String getCategory() {
+    public Category getCategory() {
         return category;
     }
 
-    public void setCategory(String category) {
+    public void setCategory(Category category) {
         this.category = category;
     }
 
@@ -59,11 +51,11 @@ public class Item implements Serializable {
         this.amount = amount;
     }
 
-    public String getAddedAt() {
+    public Date getAddedAt() {
         return addedAt;
     }
 
-    public void setAddedAt(String addedAt) {
+    public void setAddedAt(Date addedAt) {
         this.addedAt = addedAt;
     }
 }

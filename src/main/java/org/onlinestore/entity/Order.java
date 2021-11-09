@@ -57,4 +57,16 @@ public class Order {
     public void setComment(String comment) {
         this.comment = comment;
     }
+
+    @Override
+    public String toString() {
+        return "Order{" +
+                "id=" + id +
+                ", user=" + user +
+                ", items=" + items +
+                ", priceOfOrder=" + priceOfOrder +
+                ", status='" + status + '\'' +
+                ", comment='" + comment + '\'' +
+                '}';
+    }
 }

@@ -16,6 +16,7 @@ public class UserDao implements Dao<User> {
             "VALUE (?, ?, ?, ?, ?, ?, ?)";
     private static final String SQL_UPDATE_USER = "UPDATE user SET login = (?), first_name = (?), last_name = (?), " +
             "user_password = (?), email = (?), phone = (?), role_title = (?), banne = (?) WHERE id = (?)";
+
     private static UserDao instance;
 
     private UserDao() {
