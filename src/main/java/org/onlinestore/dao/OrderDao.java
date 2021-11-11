@@ -1,18 +1,26 @@
 package org.onlinestore.dao;
 
+import org.onlinestore.entity.Item;
 import org.onlinestore.entity.Order;
 
 import javax.naming.NamingException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
-public class OrderDao implements Dao<Order>{
+public class OrderDao implements Dao<Order> {
     private static OrderDao instance;
 
-    public static final String SQL_GET_ORDER_BY_ID = "SELECT * FROM order_description WHERE id = (?)";
+    private static final String SQL_GET_ORDER_BY_ID = "SELECT * FROM bill WHERE id = (?)";
+    private static final String SQL_GET_ALL_ORDERS = "SELECT * FROM bill";
+    private static final String SQL_GET_ALL_USER_ORDERS = "SELECT * FROM bill WHERE user_id=(?)";
+    private static final String SQL_INSERT_ORDER = "INSERT INTO bill(user_id, order_price, status, comment) VALUE (?, ?, ?, ?)";
+    private static final String SQL_UPDATE_ORDER = "UPDATE bill SET user_id = (?), " +
+            "order_price = (?), status = (?), comment(?) WHERE id = (?)";
+    private static final String SQL_INSERT_ITEMS_ORDERS = "INSERT INTO item_order(item_id, order_id) VALUE (?,?)";
+    private static final String SQL_GET_ITEMS_TO_ORDER = "SELECT item_id FROM item_order WHERE order_id = (?)";
+
+
     private OrderDao() {
 
     }
@@ -23,20 +31,23 @@ public class OrderDao implements Dao<Order>{
         }
         return instance;
     }
+
     @Override
     public Order get(int id) throws SQLException, NamingException {
         Order order;
         try (Connection connection = DBManager.getConnection();
              PreparedStatement ps = connection.prepareStatement(SQL_GET_ORDER_BY_ID)) {
+            ps.setInt(1, id);
             order = new Order();
-            try(ResultSet rs = ps.executeQuery()) {
+            try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     order.setId(rs.getInt(1));
                     UserDao userDao = UserDao.getInstance();
                     order.setUser(userDao.get(rs.getInt(2)));
-                    order.setPriceOfOrder(rs.getDouble(3));
+                    order.setPriceOfOrder(rs.getBigDecimal(3));
                     order.setStatus(rs.getString(4));
                     order.setComment(rs.getString(5));
+                    order.setItems(getItemOrder(order.getId()));
                 }
             }
         }
@@ -44,17 +55,79 @@ public class OrderDao implements Dao<Order>{
     }
 
     @Override
-    public List<Order> getAll() {
-        return null;
+    public List<Order> getAll() throws SQLException, NamingException {
+        List<Order> orders = new ArrayList<>();
+        try (Connection connection = DBManager.getConnection();
+             Statement statement = connection.createStatement();
+             ResultSet rs = statement.executeQuery(SQL_GET_ALL_ORDERS)) {
+            while (rs.next()) {
+                Order order = new Order();
+                order.setId(rs.getInt(1));
+                order.setUser(UserDao.getInstance().get(rs.getInt(2)));
+                order.setPriceOfOrder(rs.getBigDecimal(3));
+                order.setStatus(rs.getString(4));
+                order.setComment(rs.getString(5));
+                order.setItems(getItemOrder(order.getId()));
+                orders.add(order);
+            }
+        }
+        return orders;
     }
 
     @Override
-    public void insert(Order order) {
+    public void insert(Order order) throws SQLException, NamingException {
+        try (Connection connection = DBManager.getConnection();
+             PreparedStatement ps = connection.prepareStatement(SQL_INSERT_ORDER, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setInt(1, order.getUser().getId());
+            ps.setBigDecimal(2, order.getPriceOfOrder());
+            ps.setString(3, order.getStatus());
+            ps.setString(4, order.getComment());
+            if (ps.executeUpdate() > 0) {
+                try (ResultSet rs = ps.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        order.setId(rs.getInt(1));
+                    }
+                }
+            }
+            setItemsForOrder(order);
+        }
+    }
 
+    public void setItemsForOrder(Order order) throws SQLException, NamingException {
+        try (Connection connection = DBManager.getConnection();
+             PreparedStatement ps = connection.prepareStatement(SQL_INSERT_ITEMS_ORDERS)) {
+            for (Item item : order.getItems()) {
+                ps.setInt(1, item.getId());
+                ps.setInt(2, order.getId());
+                ps.addBatch();
+            }
+            ps.executeBatch();
+        }
+    }
+
+    public List<Item> getItemOrder (int id) throws SQLException, NamingException {
+        List<Item> items = new ArrayList<>();
+        try (Connection connection = DBManager.getConnection();
+        PreparedStatement ps = connection.prepareStatement(SQL_GET_ITEMS_TO_ORDER)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    items.add(ItemDao.getInstance().get(rs.getInt(1)));
+                }
+            }
+        }
+        return items;
     }
 
     @Override
-    public void update(Order order) {
-
+    public void update(Order order) throws SQLException, NamingException {
+        try (Connection connection = DBManager.getConnection();
+             PreparedStatement ps = connection.prepareStatement(SQL_INSERT_ORDER)) {
+            ps.setInt(1, order.getUser().getId());
+            ps.setBigDecimal(2, order.getPriceOfOrder());
+            ps.setString(3, order.getStatus());
+            ps.setString(4, order.getComment());
+            ps.executeUpdate();
+        }
     }
 }

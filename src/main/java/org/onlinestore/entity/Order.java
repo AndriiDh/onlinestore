@@ -1,12 +1,14 @@
 package org.onlinestore.entity;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Order {
     private int id;
     private User user;
     private List<Item> items;
-    private double priceOfOrder;
+    private BigDecimal priceOfOrder;
     private String status;
     private String comment;
 
@@ -31,14 +33,15 @@ public class Order {
     }
 
     public void setItems(List<Item> items) {
-        this.items = items;
+        this.items = new ArrayList<>();
+        this.items.addAll(items);
     }
 
-    public double getPriceOfOrder() {
+    public BigDecimal getPriceOfOrder() {
         return priceOfOrder;
     }
 
-    public void setPriceOfOrder(double priceOfOrder) {
+    public void setPriceOfOrder(BigDecimal priceOfOrder) {
         this.priceOfOrder = priceOfOrder;
     }
 

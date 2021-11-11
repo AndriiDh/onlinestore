@@ -1,12 +1,13 @@
 package org.onlinestore.entity;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class Item implements Serializable {
     private int id;
     private String title;
-    private double price;
+    private BigDecimal price;
     private Category category;
     private int amount;
     private Date addedAt;
@@ -27,11 +28,11 @@ public class Item implements Serializable {
         this.title = title;
     }
 
-    public double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 
@@ -57,5 +58,17 @@ public class Item implements Serializable {
 
     public void setAddedAt(Date addedAt) {
         this.addedAt = addedAt;
+    }
+
+    @Override
+    public String toString() {
+        return "Item{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", price=" + price +
+                ", category=" + category +
+                ", amount=" + amount +
+                ", addedAt=" + addedAt +
+                '}';
     }
 }

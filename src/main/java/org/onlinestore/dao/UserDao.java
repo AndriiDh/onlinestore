@@ -12,8 +12,8 @@ public class UserDao implements Dao<User> {
     private static final String SQL_GET_USER_BY_ID = "SELECT * FROM user WHERE id = (?)";
     private static final String SQL_GET_USER_BY_LOGIN = "SELECT * FROM user WHERE login = (?)";
     private static final String SQL_GET_ALL_USERS = "SELECT * FROM user";
-    private static final String SQL_INSERT_USER = "INSERT INTO user(login, first_name, last_name, user_password, email, phone, role_title)" +
-            "VALUE (?, ?, ?, ?, ?, ?, ?)";
+    private static final String SQL_INSERT_USER = "INSERT INTO user(login, first_name, last_name, user_password, email, phone, role_title, banned, available_money)" +
+            "VALUE (?, ?, ?, ?, ?, ?, ?, ?, ?)";
     private static final String SQL_UPDATE_USER = "UPDATE user SET login = (?), first_name = (?), last_name = (?), " +
             "user_password = (?), email = (?), phone = (?), role_title = (?), banne = (?) WHERE id = (?)";
 
@@ -48,6 +48,7 @@ public class UserDao implements Dao<User> {
                     user.setPhoneNumber(rs.getString(7));
                     user.setRole(Role.valueOf(rs.getString(8).toUpperCase()));
                     user.setBanned(rs.getBoolean(9));
+                    user.setMoney(rs.getBigDecimal(10));
                 }
             }
         }
@@ -58,6 +59,7 @@ public class UserDao implements Dao<User> {
         User user = null;
         try (Connection connection = DBManager.getConnection();
              PreparedStatement ps = connection.prepareStatement(SQL_GET_USER_BY_LOGIN)) {
+            ps.setString(1, login);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     user = new User();
@@ -93,6 +95,7 @@ public class UserDao implements Dao<User> {
                 user.setPhoneNumber(rs.getString(7));
                 user.setRole(Role.valueOf(rs.getString(8).toUpperCase()));
                 user.setBanned(rs.getBoolean(9));
+                user.setMoney(rs.getBigDecimal(10));
                 users.add(user);
             }
         }
@@ -102,7 +105,7 @@ public class UserDao implements Dao<User> {
     @Override
     public void insert(User user) throws SQLException, NamingException {
         try (Connection connection = DBManager.getConnection();
-             PreparedStatement ps = connection.prepareStatement(SQL_INSERT_USER)) {
+             PreparedStatement ps = connection.prepareStatement(SQL_INSERT_USER, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, user.getLogin());
             ps.setString(2, user.getFirstName());
             ps.setString(3, user.getLastName());
@@ -110,6 +113,8 @@ public class UserDao implements Dao<User> {
             ps.setString(5, user.getEmail());
             ps.setString(6, user.getPhoneNumber());
             ps.setString(7, Role.CUSTOMER.getValue());
+            ps.setBoolean(8, user.isBanned());
+            ps.setBigDecimal(9, user.getMoney());
             if (ps.executeUpdate() > 0) {
                 try (ResultSet set = ps.getGeneratedKeys()) {
                     if (set.next()) {

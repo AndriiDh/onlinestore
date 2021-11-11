@@ -1,6 +1,7 @@
 package org.onlinestore.entity;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 public class User implements Serializable {
     private int id;
@@ -10,7 +11,16 @@ public class User implements Serializable {
     private String password;
     private String email;
     private String phoneNumber;
+    private BigDecimal money;
     private boolean banned;
+
+    public BigDecimal getMoney() {
+        return money;
+    }
+
+    public void setMoney(BigDecimal money) {
+        this.money = money;
+    }
 
     public boolean isBanned() {
         return banned;
@@ -96,6 +106,7 @@ public class User implements Serializable {
                 ", password='" + password + '\'' +
                 ", email='" + email + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +
+                ", money=" + money +
                 ", banned=" + banned +
                 ", role=" + role +
                 '}';
