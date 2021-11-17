@@ -11,7 +11,7 @@
 </head>
     <body class="text-center">
         <main class="form-login">
-            <form class="needs-validation" action="logInServlet" method="post">
+            <form class="needs-validation" action="login" method="post">
                 <h1 class="h3 mb-3 fw-normal">Login</h1>
                 <c:if test="${sessionScope['invalid-login']}">
                     <div class="form-floating">
@@ -22,6 +22,12 @@
                         </div>
                     </div>
                 </c:if>
+                <c:if test="${not sessionScope['invalid-login']}">
+                    <div class="form-floating">
+                        <input name="login" type="text" class="form-control" id="login" placeholder="name@example.com">
+                        <label for="login">Login</label>
+                    </div>
+                </c:if>
                 <c:if test="${sessionScope['invalid-password']}">
                     <div class="form-floating">
                         <input name="password" type="password" class="form-control is-invalid" id="password"
@@ -30,12 +36,6 @@
                         <div class="invalid-feedback">
                             Wrong password
                         </div>
-                    </div>
-                </c:if>
-                <c:if test="${not sessionScope['invalid-login']}">
-                    <div class="form-floating">
-                        <input name="login" type="text" class="form-control" id="login" placeholder="name@example.com">
-                        <label for="login">Login</label>
                     </div>
                 </c:if>
                 <c:if test="${not sessionScope['invalid-password']}">

@@ -2,6 +2,7 @@ package org.onlinestore.entity;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.List;
 
 public class User implements Serializable {
     private int id;
@@ -13,6 +14,15 @@ public class User implements Serializable {
     private String phoneNumber;
     private BigDecimal money;
     private boolean banned;
+    private List<Item> cart;
+
+    public List<Item> getCart() {
+        return cart;
+    }
+
+    public void setCart(List<Item> cart) {
+        this.cart = cart;
+    }
 
     public BigDecimal getMoney() {
         return money;

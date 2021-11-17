@@ -32,6 +32,26 @@ public class OrderDao implements Dao<Order> {
         return instance;
     }
 
+    public List<Order> getByUserId(int id) throws SQLException, NamingException {
+        List<Order> orders = new ArrayList<>();
+        try (Connection connection = DBManager.getConnection();
+        PreparedStatement ps = connection.prepareStatement(SQL_GET_ALL_USER_ORDERS)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Order order = new Order();
+                    order.setId(rs.getInt(1));
+                    order.setUser(UserDao.getInstance().get(rs.getInt(2)));
+                    order.setPriceOfOrder(rs.getBigDecimal(3));
+                    order.setStatus(rs.getString(4));
+                    order.setComment(rs.getString(5));
+                    order.setItems(getItemOrder(order.getId()));
+                    orders.add(order);
+                }
+            }
+        }
+        return orders;
+    }
     @Override
     public Order get(int id) throws SQLException, NamingException {
         Order order;
