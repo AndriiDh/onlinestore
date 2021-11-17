@@ -3,8 +3,10 @@ package org.onlinestore.controller;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mindrot.jbcrypt.BCrypt;
+import org.onlinestore.dao.OrderDao;
 import org.onlinestore.dao.UserDao;
 import org.onlinestore.entity.User;
+import org.onlinestore.entity.Item;
 
 import javax.naming.NamingException;
 import javax.servlet.ServletException;
@@ -14,6 +16,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
@@ -35,9 +39,22 @@ public class LoginServlet extends HttpServlet {
                 return;
             }
             if (BCrypt.checkpw(req.getParameter("password"),user.getPassword())) {
+                OrderDao orderDao = OrderDao.getInstance();
+                List<Item> cart = (List<Item>) req.getSession().getAttribute("cart");
+                int cartId = orderDao.getCartId(user.getId());
+                if (cart == null) {
+                    cart = new ArrayList<>();
+                }
+
                 req.getSession().removeAttribute("invalid-login");
                 req.getSession().removeAttribute("invalid-password");
                 req.getSession().setAttribute("user", user);
+                List<Item> cartDao = orderDao.getItemOrder(cartId);
+                cart.addAll(cartDao);
+                user.setCart(cart);
+                orderDao.delete(cartId);
+
+                req.getSession().removeAttribute("cart");
                 resp.sendRedirect("catalog");
             } else {
                 req.getSession().setAttribute("invalid-password", true);

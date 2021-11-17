@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <html>
 <head>
@@ -8,9 +8,10 @@
 </head>
 <body>
 <%@ include file="header.jspf" %>
-<form name="order" action="cartProcessing" method="post">
+<form name="order" action="buy" method="post">
     <label for="comment">Comment</label>
-    <input name="comment" type="text" id="comment" value="Type about any issue"/>
+    <input name="comment" type="text" id="comment"/>
+    <button type="submit">Submit</button>
 </form>
 
 </body>

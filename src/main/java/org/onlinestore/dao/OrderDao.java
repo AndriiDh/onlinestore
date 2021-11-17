@@ -1,5 +1,7 @@
 package org.onlinestore.dao;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.onlinestore.entity.Item;
 import org.onlinestore.entity.Order;
 
@@ -10,6 +12,7 @@ import java.util.List;
 
 public class OrderDao implements Dao<Order> {
     private static OrderDao instance;
+    private static Logger logger = LogManager.getLogger(OrderDao.class);
 
     private static final String SQL_GET_ORDER_BY_ID = "SELECT * FROM bill WHERE id = (?)";
     private static final String SQL_GET_ALL_ORDERS = "SELECT * FROM bill";
@@ -19,7 +22,9 @@ public class OrderDao implements Dao<Order> {
             "order_price = (?), status = (?), comment(?) WHERE id = (?)";
     private static final String SQL_INSERT_ITEMS_ORDERS = "INSERT INTO item_order(item_id, order_id) VALUE (?,?)";
     private static final String SQL_GET_ITEMS_TO_ORDER = "SELECT item_id FROM item_order WHERE order_id = (?)";
-
+    private static final String SQL_GET_USER_CART = "SELECT id FROM bill WHERE user_id = (?) AND status = 'cart'";
+    private static final String SQL_DELETE_CART = "DELETE FROM bill WHERE id = (?)";
+    private static final String SQL_DELETE_ITEMS = "DELETE FROM item_order WHERE order_id = (?)";
 
     private OrderDao() {
 
@@ -35,7 +40,7 @@ public class OrderDao implements Dao<Order> {
     public List<Order> getByUserId(int id) throws SQLException, NamingException {
         List<Order> orders = new ArrayList<>();
         try (Connection connection = DBManager.getConnection();
-        PreparedStatement ps = connection.prepareStatement(SQL_GET_ALL_USER_ORDERS)) {
+             PreparedStatement ps = connection.prepareStatement(SQL_GET_ALL_USER_ORDERS)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -52,6 +57,7 @@ public class OrderDao implements Dao<Order> {
         }
         return orders;
     }
+
     @Override
     public Order get(int id) throws SQLException, NamingException {
         Order order;
@@ -125,10 +131,10 @@ public class OrderDao implements Dao<Order> {
         }
     }
 
-    public List<Item> getItemOrder (int id) throws SQLException, NamingException {
+    public List<Item> getItemOrder(int id) throws SQLException, NamingException {
         List<Item> items = new ArrayList<>();
         try (Connection connection = DBManager.getConnection();
-        PreparedStatement ps = connection.prepareStatement(SQL_GET_ITEMS_TO_ORDER)) {
+             PreparedStatement ps = connection.prepareStatement(SQL_GET_ITEMS_TO_ORDER)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -137,6 +143,19 @@ public class OrderDao implements Dao<Order> {
             }
         }
         return items;
+    }
+
+    public int getCartId(int userId) throws SQLException, NamingException {
+        try (Connection connection = DBManager.getConnection();
+             PreparedStatement ps = connection.prepareStatement(SQL_GET_USER_CART)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        }
+        return -1;
     }
 
     @Override
@@ -148,6 +167,20 @@ public class OrderDao implements Dao<Order> {
             ps.setString(3, order.getStatus());
             ps.setString(4, order.getComment());
             ps.executeUpdate();
+        }
+    }
+
+    @Override
+    public void delete(int id) throws SQLException, NamingException {
+        try (Connection connection = DBManager.getConnection();
+             PreparedStatement ps = connection.prepareStatement(SQL_DELETE_CART);
+             PreparedStatement ps1 = connection.prepareStatement(SQL_DELETE_ITEMS)) {
+            ps1.setInt(1, id);
+            ps1.executeUpdate();
+            ps.setInt(1, id);
+            if (ps.executeUpdate() != 1) {
+                logger.warn("Cart wasn't deleted!");
+            }
         }
     }
 }
