@@ -2,7 +2,10 @@ package org.onlinestore.entity;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class User implements Serializable {
     private int id;
@@ -14,13 +17,17 @@ public class User implements Serializable {
     private String phoneNumber;
     private BigDecimal money;
     private boolean banned;
-    private List<Item> cart;
+    private Map<Item, Integer> cart;
 
-    public List<Item> getCart() {
+    public User() {
+        cart = new HashMap<>();
+    }
+
+    public  Map<Item, Integer> getCart() {
         return cart;
     }
 
-    public void setCart(List<Item> cart) {
+    public void setCart( Map<Item, Integer> cart) {
         this.cart = cart;
     }
 

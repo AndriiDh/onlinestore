@@ -15,7 +15,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @WebServlet("/buy")
 public class BuyServlet extends HttpServlet {
@@ -30,8 +32,9 @@ public class BuyServlet extends HttpServlet {
         User user = (User) req.getSession().getAttribute("user");
         if (user == null) {
             resp.sendRedirect("catalog");
+            return;
         }
-        List<Item> items = user.getCart();
+        Map<Item, Integer> items = user.getCart();
         try {
             if (items != null && !items.isEmpty()) {
                 Order order = new Order();
@@ -42,9 +45,8 @@ public class BuyServlet extends HttpServlet {
                 order.setPriceOfOrder(ItemDao.getInstance().getItemsPrice(items));
                 OrderDao.getInstance().insert(order);
             }
-            user.setCart(new ArrayList<>());
+            user.setCart(new HashMap<>());
             req.getSession().removeAttribute("total");
-            System.out.println("SUCCESSFULLY");
             resp.sendRedirect("catalog");
         } catch (SQLException | NamingException throwables) {
             throwables.printStackTrace();

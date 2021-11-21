@@ -121,6 +121,8 @@ public class UserDao implements Dao<User> {
                         user.setId(set.getInt(1));
                     }
                 }
+            } else {
+                throw new SQLException("User wasn't inserted");
             }
         }
 

@@ -1,13 +1,14 @@
 package org.onlinestore.entity;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-public class Order {
+public class Order implements Serializable {
     private int id;
     private User user;
-    private List<Item> items;
+    private Map<Item, Integer> items;
     private BigDecimal priceOfOrder;
     private String status;
     private String comment;
@@ -28,13 +29,13 @@ public class Order {
         this.user = user;
     }
 
-    public List<Item> getItems() {
+    public  Map<Item, Integer> getItems() {
         return items;
     }
 
-    public void setItems(List<Item> items) {
-        this.items = new ArrayList<>();
-        this.items.addAll(items);
+    public void setItems( Map<Item, Integer> items) {
+        this.items = new HashMap<>();
+        this.items.putAll(items);
     }
 
     public BigDecimal getPriceOfOrder() {

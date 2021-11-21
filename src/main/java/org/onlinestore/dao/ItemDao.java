@@ -7,7 +7,6 @@ import javax.naming.NamingException;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -16,9 +15,13 @@ public class ItemDao implements Dao<Item> {
     private static ItemDao instance;
 
     private static final String SQL_GET_ITEM_BY_ID = "SELECT * FROM item LEFT JOIN item_description ON id = item_description.item_id WHERE id = (?)";
-    private static final String SQL_GET_ALL_ITEMS = "SELECT * FROM item LEFT JOIN item_description id on item.id = id.item_id";
+    private static final String SQL_GET_ALL_ITEMS = "SELECT * FROM item LEFT JOIN item_description id ON item.id = id.item_id " +
+            "WHERE title REGEXP (?) ORDER BY %s LIMIT ? OFFSET ?";
     private static final String SQL_GET_ITEMS_BY_ORDER_ID = "SELECT item_id FROM item_order WHERE order_id = (?)";
     private static final String SQL_GET_ITEM_PRICE = "SELECT price FROM item WHERE id=(?)";
+    private static final String SQL_GET_ITEMS_BY_NAME = "SELECT * FROM item LEFT JOIN item_description " +
+            "ON item.id = item_description.item_id WHERE item.title REGEXP (?)";
+    private static final int PRODUCTS_PER_PAGE = 8;
 
 
     private ItemDao() {
@@ -56,39 +59,70 @@ public class ItemDao implements Dao<Item> {
         return item;
     }
 
-    @Override
-    public List<Item> getAll() throws SQLException, NamingException {
+    public List<Item> searchItems(String name) throws SQLException, NamingException {
         List<Item> items = new ArrayList<>();
-        CategoryDao cd = CategoryDao.getInstance();
         try (Connection connection = DBManager.getConnection();
-             Statement statement = connection.createStatement();
-             ResultSet rs = statement.executeQuery(SQL_GET_ALL_ITEMS)) {
-            while (rs.next()) {
-                Item item = new Item();
-                item.setId(rs.getInt(1));
-                item.setTitle(rs.getString(2));
-                item.setPrice(rs.getBigDecimal(3));
-                item.setImage(rs.getString(4));
-                item.setAmount(rs.getInt(5));
-                item.setAddedAt(rs.getDate(6));
-                item.setCategory(cd.get(rs.getInt(7)));
-                item.setDescription(rs.getString(10));
-                items.add(item);
+             PreparedStatement ps = connection.prepareStatement(SQL_GET_ITEMS_BY_NAME)) {
+            ps.setString(1, name);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Item item = new Item();
+                    item.setId(rs.getInt(1));
+                    item.setTitle(rs.getString(2));
+                    item.setPrice(rs.getBigDecimal(3));
+                    item.setImage(rs.getString(4));
+                    item.setAmount(rs.getInt(5));
+                    item.setAddedAt(rs.getDate(6));
+                    item.setCategory(CategoryDao.getInstance().get(rs.getInt(7)));
+                    item.setDescription(rs.getString(10));
+                    items.add(item);
+                }
             }
         }
         return items;
     }
 
-    public BigDecimal getItemsPrice(List<Item> list) throws SQLException, NamingException {
+    @Override
+    public List<Item> getAll() {
+        throw new UnsupportedOperationException();
+    }
+
+    public List<Item> getAll(String query, String sort) throws SQLException, NamingException {
+        ArrayList<Item> items = new ArrayList<>();
+        try (Connection connection = DBManager.getConnection();
+             PreparedStatement ps = connection.prepareStatement(String.format(SQL_GET_ALL_ITEMS, sort))) {
+            ps.setString(1, query);
+            ps.setInt(2, PRODUCTS_PER_PAGE);
+            ps.setInt(3, 0);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Item item = new Item();
+                    item.setId(rs.getInt(1));
+                    item.setTitle(rs.getString(2));
+                    item.setPrice(rs.getBigDecimal(3));
+                    item.setImage(rs.getString(4));
+                    item.setAmount(rs.getInt(5));
+                    item.setAddedAt(rs.getDate(6));
+                    item.setCategory(CategoryDao.getInstance().get(rs.getInt(7)));
+                    item.setDescription(rs.getString(10));
+                    items.add(item);
+                }
+            }
+        }
+        return items;
+    }
+
+    public BigDecimal getItemsPrice(Map<Item, Integer> list) throws SQLException, NamingException {
         BigDecimal sum = BigDecimal.ZERO;
         if (list.size() > 0) {
-            for (Item item : list) {
+            for (Map.Entry<Item, Integer> item : list.entrySet()) {
                 try (Connection connection = DBManager.getConnection();
                      PreparedStatement ps = connection.prepareStatement(SQL_GET_ITEM_PRICE)) {
-                    ps.setInt(1, item.getId());
+                    ps.setInt(1, item.getKey().getId());
                     try (ResultSet rs = ps.executeQuery()) {
                         if (rs.next()) {
-                            sum = sum.add(rs.getBigDecimal(1));
+                            sum = sum.add(rs.getBigDecimal(1)
+                                    .multiply(BigDecimal.valueOf(list.get(item.getKey()))));
                         }
                     }
                 }
@@ -137,8 +171,8 @@ public class ItemDao implements Dao<Item> {
 
         private static final String SQL_GET_CATEGORY_BY_ID = "SELECT * FROM category WHERE id = (?)";
         private static final String SQL_GET_ALL_CATEGORIES = "SELECT * FROM category";
-        private static final String SQL_INSERT_INTO_CATEGORY = "INSERT INTO category(name) VALUE (?)";
-        private static final String SQL_UPDATE_CATEGORY_BY_ID = "UPDATE category SET name = (?) WHERE id = (?)";
+        private static final String SQL_INSERT_INTO_CATEGORY = "INSERT INTO category(category) VALUE (?)";
+        private static final String SQL_UPDATE_CATEGORY_BY_ID = "UPDATE category SET category = (?) WHERE id = (?)";
 
         private CategoryDao() {
 

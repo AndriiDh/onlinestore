@@ -17,7 +17,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
@@ -39,22 +41,22 @@ public class LoginServlet extends HttpServlet {
                 return;
             }
             if (BCrypt.checkpw(req.getParameter("password"),user.getPassword())) {
-                OrderDao orderDao = OrderDao.getInstance();
-                List<Item> cart = (List<Item>) req.getSession().getAttribute("cart");
-                int cartId = orderDao.getCartId(user.getId());
-                if (cart == null) {
-                    cart = new ArrayList<>();
-                }
-
                 req.getSession().removeAttribute("invalid-login");
                 req.getSession().removeAttribute("invalid-password");
-                req.getSession().setAttribute("user", user);
-                List<Item> cartDao = orderDao.getItemOrder(cartId);
-                cart.addAll(cartDao);
-                user.setCart(cart);
-                orderDao.delete(cartId);
 
+                OrderDao orderDao = OrderDao.getInstance();
+                Map<Item, Integer> cart = (Map<Item, Integer>) req.getSession().getAttribute("cart");
+                cart = cart == null ? new HashMap<>() : cart;
+                int cartId = orderDao.getCartId(user.getId());
+                Map<Item, Integer> cartDao = orderDao.getItemOrder(cartId);
+                cart.putAll(cartDao);
+                user.setCart(cart);
+
+                req.getSession().setAttribute("user", user);
+
+                orderDao.delete(cartId);
                 req.getSession().removeAttribute("cart");
+
                 resp.sendRedirect("catalog");
             } else {
                 req.getSession().setAttribute("invalid-password", true);

@@ -1,7 +1,6 @@
 package org.onlinestore.controller;
 
 import org.onlinestore.dao.ItemDao;
-import org.onlinestore.dao.OrderDao;
 import org.onlinestore.entity.Item;
 import org.onlinestore.entity.Order;
 import org.onlinestore.entity.User;
@@ -15,40 +14,49 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.SQLException;
-import java.util.List;
+import java.util.Map;
 
 @WebServlet("/cartProcessing")
 public class CartServlet extends HttpServlet {
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String action = req.getParameter("edit");
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String action = req.getParameter("action");
         int id = Integer.parseInt(req.getParameter("id"));
-        List<Item> cartItems;
+        Map<Item, Integer> cartItems;
+        BigDecimal sum = BigDecimal.ZERO;
         if (req.getSession().getAttribute("user") == null) {
-            cartItems = (List<Item>) req.getSession().getAttribute("cart");
+            cartItems = (Map<Item, Integer>) req.getSession().getAttribute("cart");
         } else {
             User user = (User) req.getSession().getAttribute("user");
             cartItems = user.getCart();
         }
         try {
+            Item item = ItemDao.getInstance().get(id);
             switch (action) {
                 case "delete":
-                    Item item = ItemDao.getInstance().get(id);
                     cartItems.remove(item);
-                    BigDecimal sum = (BigDecimal) req.getSession().getAttribute("total");
-                    sum = sum.subtract(item.getPrice());
-                    req.getSession().setAttribute("total", sum);
-                    resp.sendRedirect("cart.jsp");
                     break;
-                case "buy":
-                    Order order = new Order();
-                    order.setItems(cartItems);
-
-
+                case "increase":
+                    Integer increase = cartItems.get(item);
+                    cartItems.replace(item, ++increase);
+                    break;
+                case "decrease":
+                    Integer decrease = cartItems.get(item);
+                    decrease = decrease == 1 ? 1 : decrease - 1;
+                    cartItems.replace(item, decrease);
+                    break;
             }
+            sum = ItemDao.getInstance().getItemsPrice(cartItems);
         } catch (SQLException | NamingException e) {
             // errors
             e.printStackTrace();
         }
+        req.getSession().setAttribute("total", sum);
+        resp.sendRedirect("cart.jsp");
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        super.doPost(req, resp);
     }
 }

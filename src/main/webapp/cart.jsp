@@ -25,55 +25,57 @@
         </thead>
         <tbody>
         <c:if test="${sessionScope.user eq null}">
-            <c:forEach var="item" items="${sessionScope.cart}">
+            <c:forEach var="item" items="${sessionScope.cart.entrySet()}">
                 <tr>
-                    <td><c:out value="${item.title}"/></td>
-                    <td><c:out value="${item.category.name}"/></td>
-                    <td><c:out value="${item.price}"/></td>
+                    <td><c:out value="${item.key.title}"/></td>
+                    <td><c:out value="${item.key.category.name}"/></td>
+                    <td><c:out value="${item.key.price}"/></td>
                     <td>
-                        <form action="" method="post" class="form-inline">
+                        <form class="form-inline">
                             <input type="hidden" name="id" value="1" class="form-input">
                             <div class="form-group d-flex justify-content-between">
-                                <a class="btn btn-sm btn-incre" href="#"><i
-                                        class="fas fa-plus-square"></i></a>
+                                <a class="btn btn-sm btn-decrease"
+                                   href="cartProcessing?action=decrease&id=<c:out value="${item.key.id}"/>"><i
+                                        class="fas fa-minus-square"></i></a>
                                 <label>
-                                    <input type="text" name="quantity" class="form-control" value="1" readonly>
+                                    <input type="text" name="quantity" class="form-control" value="<c:out value="${item.value}"/>" readonly>
                                 </label>
-                                <a class="btn btn-sm btn-decre" href="#">
-                                    <i class="fas fa-minus-square"></i>
+                                <a class="btn btn-sm btn-increase"
+                                   href="cartProcessing?action=increase&id=<c:out value="${item.key.id}"/>">
+                                    <i class="fas fa-plus-square"></i>
                                 </a>
                             </div>
                         </form>
                     </td>
                     <td><a class="btn btn-sm btn-sm btn-dark"
-                           href="cartProcessing?edit=delete&id=<c:out value="${item.id}"/>">Remove</a></td>
+                           href="cartProcessing?action=delete&id=<c:out value="${item.key.id}"/>">Remove</a></td>
                 </tr>
             </c:forEach>
         </c:if>
         <c:if test="${sessionScope.user != null}">
-            <c:forEach var="item" items="${sessionScope.user.cart}">
+            <c:forEach var="item" items="${sessionScope.user.cart.entrySet()}">
                 <tr>
-                    <td><c:out value="${item.title}"/></td>
-                    <td><c:out value="${item.category.name}"/></td>
-                    <td><c:out value="${item.price}"/></td>
+                    <td><c:out value="${item.key.title}"/></td>
+                    <td><c:out value="${item.key.category.name}"/></td>
+                    <td><c:out value="${item.key.price}"/></td>
                     <td>
-                        <form action="cartProcessing?delete=<c:out value="${item.id}"/>" method="post"
+                        <form action="cartProcessing?delete=<c:out value="${item.key.id}"/>" method="post"
                               class="form-inline">
                             <input type="hidden" name="id" value="1" class="form-input">
                             <div class="form-group d-flex justify-content-between">
-                                <a class="btn btn-sm btn-incre" href="#"><i
-                                        class="fas fa-plus-square"></i></a>
+                                <a class="btn btn-sm btn-decrease" href="cartProcessing?action=decrease&id=<c:out value="${item.key.id}"/>"><i
+                                        class="fas fa-minus-square"></i></a>
                                 <label>
-                                    <input type="text" name="quantity" class="form-control" value="1" readonly>
+                                    <input type="text" name="quantity" class="form-control" value="<c:out value="${item.value}"/> " readonly>
                                 </label>
-                                <a class="btn btn-sm btn-decre" href="#">
-                                    <i class="fas fa-minus-square"></i>
+                                <a class="btn btn-sm btn-increase" href="cartProcessing?action=increase&id=<c:out value="${item.key.id}"/>">
+                                    <i class="fas fa-plus-square"></i>
                                 </a>
                             </div>
                         </form>
                     </td>
                     <td><a class="btn btn-sm btn-sm btn-dark"
-                           href="cartProcessing?edit=delete&id=<c:out value="${item.id}"/>">Remove</a>
+                           href="cartProcessing?action=delete&id=<c:out value="${item.key.id}"/>">Remove</a>
                     </td>
                 </tr>
             </c:forEach>
@@ -84,6 +86,5 @@
         <a class="btn btn-lg btn-outline-dark" href="buy.jsp">Buy</a>
     </c:if>
 </div>
-
 </body>
 </html>

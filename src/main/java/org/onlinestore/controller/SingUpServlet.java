@@ -37,13 +37,13 @@ public class SingUpServlet extends HttpServlet {
         user.setPhoneNumber(req.getParameter("phone"));
         user.setRole(Role.CUSTOMER);
         user.setMoney(BigDecimal.ZERO);
+
         try {
             UserDao.getInstance().insert(user);
             req.getSession().setAttribute("user", user);
             resp.sendRedirect("catalog");
         } catch (SQLException | NamingException throwables) {
-            log.error("User wasn't inserted");
-            throwables.printStackTrace();
+            log.error("User wasn't inserted", throwables);
         }
     }
 }

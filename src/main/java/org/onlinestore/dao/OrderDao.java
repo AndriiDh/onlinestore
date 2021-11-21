@@ -8,7 +8,9 @@ import org.onlinestore.entity.Order;
 import javax.naming.NamingException;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class OrderDao implements Dao<Order> {
     private static OrderDao instance;
@@ -20,8 +22,8 @@ public class OrderDao implements Dao<Order> {
     private static final String SQL_INSERT_ORDER = "INSERT INTO bill(user_id, order_price, status, comment) VALUE (?, ?, ?, ?)";
     private static final String SQL_UPDATE_ORDER = "UPDATE bill SET user_id = (?), " +
             "order_price = (?), status = (?), comment(?) WHERE id = (?)";
-    private static final String SQL_INSERT_ITEMS_ORDERS = "INSERT INTO item_order(item_id, order_id) VALUE (?,?)";
-    private static final String SQL_GET_ITEMS_TO_ORDER = "SELECT item_id FROM item_order WHERE order_id = (?)";
+    private static final String SQL_INSERT_ITEMS_ORDERS = "INSERT INTO item_order(item_id, order_id, count) VALUE (?,?,?)";
+    private static final String SQL_GET_ITEMS_TO_ORDER = "SELECT item_id, count FROM item_order WHERE order_id = (?)";
     private static final String SQL_GET_USER_CART = "SELECT id FROM bill WHERE user_id = (?) AND status = 'cart'";
     private static final String SQL_DELETE_CART = "DELETE FROM bill WHERE id = (?)";
     private static final String SQL_DELETE_ITEMS = "DELETE FROM item_order WHERE order_id = (?)";
@@ -122,23 +124,24 @@ public class OrderDao implements Dao<Order> {
     public void setItemsForOrder(Order order) throws SQLException, NamingException {
         try (Connection connection = DBManager.getConnection();
              PreparedStatement ps = connection.prepareStatement(SQL_INSERT_ITEMS_ORDERS)) {
-            for (Item item : order.getItems()) {
-                ps.setInt(1, item.getId());
+            for (Map.Entry<Item, Integer> item : order.getItems().entrySet()) {
+                ps.setInt(1, item.getKey().getId());
                 ps.setInt(2, order.getId());
+                ps.setInt(3, item.getValue());
                 ps.addBatch();
             }
             ps.executeBatch();
         }
     }
 
-    public List<Item> getItemOrder(int id) throws SQLException, NamingException {
-        List<Item> items = new ArrayList<>();
+    public  Map<Item, Integer> getItemOrder(int id) throws SQLException, NamingException {
+        Map<Item, Integer> items = new HashMap<>();
         try (Connection connection = DBManager.getConnection();
              PreparedStatement ps = connection.prepareStatement(SQL_GET_ITEMS_TO_ORDER)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    items.add(ItemDao.getInstance().get(rs.getInt(1)));
+                    items.put(ItemDao.getInstance().get(rs.getInt(1)), rs.getInt(2));
                 }
             }
         }

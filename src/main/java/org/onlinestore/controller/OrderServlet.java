@@ -22,7 +22,7 @@ public class OrderServlet extends HttpServlet {
         List<Order> orders;
         try {
            orders = OrderDao.getInstance().getByUserId(id);
-           req.getSession().setAttribute("orders", orders);
+           req.setAttribute("orders", orders);
            req.getRequestDispatcher("order.jsp").forward(req,resp);
         } catch (SQLException | NamingException throwables) {
             throwables.printStackTrace();

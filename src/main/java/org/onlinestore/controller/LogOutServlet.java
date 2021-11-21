@@ -27,6 +27,8 @@ public class LogOutServlet extends HttpServlet {
                 order.setItems(user.getCart());
                 order.setPriceOfOrder((BigDecimal) req.getSession().getAttribute("total"));
                 OrderDao.getInstance().insert(order);
+            } else {
+                System.out.println("There is no items to buy");
             }
         } catch (NamingException | SQLException e) {
             //todo : error handling

@@ -13,48 +13,44 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 @WebServlet("/addToCart")
 public class AddToCartServlet extends HttpServlet {
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
         resp.setContentType("text/html;charset=UTF-8");
         User user = (User) req.getSession().getAttribute("user");
-        int id = Integer.parseInt(req.getParameter("id"));
-        List<Item> cart;
-        List<Item> unRegCart = (List) req.getSession().getAttribute("cart");
-        Item item = null;
+        Map<Item, Integer> cart;
+        Map<Item, Integer> unRegCart = (Map<Item, Integer>) req.getSession().getAttribute("cart");
         BigDecimal sum = BigDecimal.ZERO;
+
         try {
-            item = ItemDao.getInstance().get(id);
+            Item item = ItemDao.getInstance().get(Integer.parseInt(req.getParameter("id")));
             if (user != null) {
                 cart = user.getCart();
-                if (cart == null) {
-                    user.setCart(new ArrayList<>());
-                    cart = user.getCart();
-                }
                 if (unRegCart != null) {
-                    cart.addAll(unRegCart);
+                    cart.putAll(unRegCart);
                     req.getSession().removeAttribute("cart");
                 }
-                if (!cart.contains(item)) {
-                    cart.add(item);
+                if (!cart.containsKey(item)) {
+                    cart.put(item, 1);
                     sum = ItemDao.getInstance().getItemsPrice(cart);
                 }
             } else {
                 if (unRegCart == null) {
-                    unRegCart = new ArrayList<>();
+                    unRegCart = new HashMap<>();
                     req.getSession().setAttribute("cart", unRegCart);
                 }
-                if (!unRegCart.contains(item)) {
-                    unRegCart.add(item);
+                if (!unRegCart.containsKey(item)) {
+                    unRegCart.put(item, 1);
                     sum = ItemDao.getInstance().getItemsPrice(unRegCart);
                 }
             }
             req.getSession().setAttribute("total", sum);
-            resp.sendRedirect("catalog");
+
+            req.getRequestDispatcher("catalog").forward(req,resp);
         } catch (SQLException | NamingException throwables) {
             // todo: error handling
             throwables.printStackTrace();

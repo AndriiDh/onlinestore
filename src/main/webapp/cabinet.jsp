@@ -10,7 +10,7 @@
 <body>
     <%@include file="header.jspf"%>
     <div class="container">
-        <h3><c:out value="${sessionScope.user.firstName}"/> cabinet</h3>
+        <h3>Cabinet</h3>
         <hr/>
         <c:if test="${sessionScope.user.role eq Role.ADMIN}">
             <button type="submit" name="Show users">Show users</button>
