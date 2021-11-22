@@ -14,7 +14,7 @@
         <hr/>
         <c:if test="${sessionScope.user.role eq Role.ADMIN}">
             <button type="submit" name="Show users">Show users</button>
-            <button type="submit" name="Add product">Add products</button>
+            <a class="btn btn-sm btn-light" type="submit" href="itemManagement?action=new">Add products</a>
         </c:if>
         <c:if test="${sessionScope.user.role eq Role.CUSTOMER}">
             <button type="submit" name="Edit profile">Edit</button>
@@ -23,5 +23,6 @@
             </a>
         </c:if>
     </div>
+    <%@include file="footer.jspf"%>
 </body>
 </html>

@@ -86,5 +86,6 @@
         <a class="btn btn-lg btn-outline-dark" href="buy.jsp">Buy</a>
     </c:if>
 </div>
+<%@include file="footer.jspf"%>
 </body>
 </html>

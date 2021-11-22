@@ -2,7 +2,7 @@ package org.onlinestore.entity;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.sql.Date;
 import java.util.Objects;
 
 public class Item implements Serializable {
@@ -19,64 +19,72 @@ public class Item implements Serializable {
         return image;
     }
 
-    public void setImage(String image) {
+    public Item setImage(String image) {
         this.image = image;
+        return this;
     }
 
     public int getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public Item setId(int id) {
         this.id = id;
+        return this;
     }
 
     public String getTitle() {
         return title;
     }
 
-    public void setTitle(String title) {
+    public Item setTitle(String title) {
         this.title = title;
+        return this;
     }
 
     public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(BigDecimal price) {
+    public Item setPrice(BigDecimal price) {
         this.price = price;
+        return this;
     }
 
     public Category getCategory() {
         return category;
     }
 
-    public void setCategory(Category category) {
+    public Item setCategory(Category category) {
         this.category = category;
+        return this;
     }
 
     public int getAmount() {
         return amount;
     }
 
-    public void setAmount(int amount) {
+    public Item setAmount(int amount) {
         this.amount = amount;
+        return this;
     }
 
     public Date getAddedAt() {
         return addedAt;
     }
 
-    public void setAddedAt(Date addedAt) {
+    public Item setAddedAt(Date addedAt) {
         this.addedAt = addedAt;
+        return this;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
+    public Item setDescription(String description) {
         this.description = description;
+        return this;
     }
 
     @Override

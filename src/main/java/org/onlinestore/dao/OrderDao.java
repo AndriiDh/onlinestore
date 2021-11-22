@@ -181,7 +181,7 @@ public class OrderDao implements Dao<Order> {
             ps1.setInt(1, id);
             ps1.executeUpdate();
             ps.setInt(1, id);
-            if (ps.executeUpdate() != 1) {
+            if (ps.executeUpdate() > 1) {
                 logger.warn("Cart wasn't deleted!");
             }
         }

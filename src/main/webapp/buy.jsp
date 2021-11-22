@@ -13,6 +13,6 @@
     <input name="comment" type="text" id="comment"/>
     <button type="submit">Submit</button>
 </form>
-
+<%@include file="footer.jspf"%>
 </body>
 </html>

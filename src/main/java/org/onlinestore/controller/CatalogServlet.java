@@ -18,7 +18,7 @@ import java.util.List;
 @WebServlet("/catalog")
 public class CatalogServlet extends HttpServlet {
     public static final Logger log = LogManager.getLogger(CatalogServlet.class);
-    private static final List<String> sort = Arrays.asList("title", "name", "date", "price");
+    private static final List<String> sort = Arrays.asList("title", "name", "add_time", "price");
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String query = req.getParameter("q");
@@ -26,7 +26,6 @@ public class CatalogServlet extends HttpServlet {
 
         query = query == null || query.isEmpty() ? "." : query;
         sortBy = sort.contains(sortBy) ? sortBy : "title";
-
 
         try {
             log.info("DoGet Method is executed");

@@ -1,5 +1,7 @@
 package org.onlinestore.dao;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.onlinestore.entity.Category;
 import org.onlinestore.entity.Item;
 
@@ -13,6 +15,7 @@ import java.util.stream.Collectors;
 
 public class ItemDao implements Dao<Item> {
     private static ItemDao instance;
+    private static final Logger LOG = LogManager.getLogger(ItemDao.class);
 
     private static final String SQL_GET_ITEM_BY_ID = "SELECT * FROM item LEFT JOIN item_description ON id = item_description.item_id WHERE id = (?)";
     private static final String SQL_GET_ALL_ITEMS = "SELECT * FROM item LEFT JOIN item_description id ON item.id = id.item_id " +
@@ -21,6 +24,9 @@ public class ItemDao implements Dao<Item> {
     private static final String SQL_GET_ITEM_PRICE = "SELECT price FROM item WHERE id=(?)";
     private static final String SQL_GET_ITEMS_BY_NAME = "SELECT * FROM item LEFT JOIN item_description " +
             "ON item.id = item_description.item_id WHERE item.title REGEXP (?)";
+    private static final String SQL_INSERT_ITEM = "INSERT INTO item(title, price, image, amount, category_id, add_time) VALUE (?,?,?,?,?,?)";
+    private static final String SQL_UPDATE_ITEM = "UPDATE item SET title=(?), price=(?), image=(?), amount=(?), add_time=(?), category_id=(?)" +
+            "WHERE id=(?)";
     private static final int PRODUCTS_PER_PAGE = 8;
 
 
@@ -158,15 +164,38 @@ public class ItemDao implements Dao<Item> {
     }
 
     @Override
-    public void insert(Item item) {
+    public void insert(Item item) throws SQLException, NamingException {
+        try (Connection connection = DBManager.getConnection();
+             PreparedStatement ps = connection.prepareStatement(SQL_INSERT_ITEM)) {
+            ps.setString(1, item.getTitle());
+            ps.setBigDecimal(2, item.getPrice());
+            ps.setString(3,item.getImage());
+            ps.setInt(4, item.getAmount());
+            ps.setInt(5, item.getCategory().getId());
+            ps.setDate(6, item.getAddedAt());
+            if (ps.executeUpdate() < 1) {
+                LOG.warn("Insert wasn't executed");
+            }
+        }
+
     }
 
     @Override
-    public void update(Item item) {
-
+    public void update(Item item) throws SQLException, NamingException {
+        try (Connection connection = DBManager.getConnection();
+        PreparedStatement ps = connection.prepareStatement(SQL_UPDATE_ITEM)) {
+            ps.setString(1, item.getTitle());
+            ps.setBigDecimal(2, item.getPrice());
+            ps.setString(3, item.getImage());
+            ps.setInt(4, item.getAmount());
+            ps.setDate(5, item.getAddedAt());
+            ps.setInt(6, item.getCategory().getId());
+            ps.setInt(7, item.getId());
+            ps.executeUpdate();
+        }
     }
 
-    private static class CategoryDao implements Dao<Category> {
+    public static class CategoryDao implements Dao<Category> {
         private static CategoryDao instance;
 
         private static final String SQL_GET_CATEGORY_BY_ID = "SELECT * FROM category WHERE id = (?)";

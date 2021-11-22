@@ -57,9 +57,11 @@
                     </c:forEach>
                     <c:param name="id" value="${item.id}"/>
                 </c:url>
-            <div class="col-md-3">
+            <div class="col-md-3 mb-1">
                 <div class="card w-100" style="width: 18rem;">
-                    <img class="card-img-top" src="<c:out value="img/${item.image}"/>" alt="Card image cap">
+                    <div class="container" style="height: 16rem">
+                        <img class="card-img-top" style="size: 20px" src="<c:out value="img/${item.image}"/>" alt="Card image cap">
+                    </div>
                     <div class="card-body">
                         <h4 class="card-title"><c:out value="${item.title}"/></h4>
                         <h5 class="card-text"><c:out value="${item.category}"/></h5>
@@ -72,7 +74,7 @@
                             <a class= "btn btn-default disabled">Out of Stock</a>
                         </c:if>
                         <c:if test="${sessionScope.user.role eq Role.ADMIN}">
-                            <a href="#" class="btn btn-outline-dark">Edit</a>
+                            <a href="itemManagement?action=edit&id=${item.id}" class="btn btn-outline-dark">Edit</a>
                         </c:if>
                     </div>
                 </div>
@@ -81,5 +83,6 @@
         </div>
     </div>
 </main>
+<%@include file="footer.jspf"%>
 </body>
 </html>
