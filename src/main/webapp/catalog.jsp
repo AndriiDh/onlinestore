@@ -53,7 +53,9 @@
             <c:forEach items="${requestScope.items}" var="item">
                 <c:url var="catalogPage" value="addToCart">
                     <c:forEach items="${param}" var="entry">
-                        <c:param name="${entry.key}" value="${entry.value}"/>
+                        <c:if test="${entry.key} != 'id' ">
+                            <c:param name="${entry.key}" value="${entry.value}"/>
+                        </c:if>
                     </c:forEach>
                     <c:param name="id" value="${item.id}"/>
                 </c:url>
@@ -75,6 +77,7 @@
                         </c:if>
                         <c:if test="${sessionScope.user.role eq Role.ADMIN}">
                             <a href="itemManagement?action=edit&id=${item.id}" class="btn btn-outline-dark">Edit</a>
+                            <a href="itemManagement?action=delete&id=${item.id}" class="btn btn-outline-dark">Delete</a>
                         </c:if>
                     </div>
                 </div>

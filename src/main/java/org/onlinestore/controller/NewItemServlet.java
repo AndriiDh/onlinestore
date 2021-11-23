@@ -34,7 +34,7 @@ public class NewItemServlet extends HttpServlet {
         String description = req.getParameter("description");
         String id = req.getParameter("id");
 
-        Category category1 = null;
+        Category categoryToInsert;
        try {
            ItemDao dao = ItemDao.getInstance();
            List<Category> categories = ItemDao.CategoryDao.getInstance().getAll();
@@ -42,7 +42,7 @@ public class NewItemServlet extends HttpServlet {
                    .stream()
                    .filter(cat -> cat.getName().equals(category))
                    .findAny();
-           category1 = c.orElse(null);
+           categoryToInsert = c.orElse(null);
 
            Item item = new Item();
            if (id == null) {
@@ -51,7 +51,7 @@ public class NewItemServlet extends HttpServlet {
                        .setImage(image)
                        .setAmount(Integer.parseInt(amount))
                        .setDescription(description)
-                       .setCategory(category1)
+                       .setCategory(categoryToInsert)
                        .setAddedAt(new Date(System.currentTimeMillis()));
                dao.insert(item);
            } else {
@@ -61,7 +61,7 @@ public class NewItemServlet extends HttpServlet {
                        .setImage(image)
                        .setAmount(Integer.parseInt(amount))
                        .setDescription(description)
-                       .setCategory(category1)
+                       .setCategory(categoryToInsert)
                        .setAddedAt(new Date(System.currentTimeMillis()));
                System.out.println(item);
                dao.update(item);

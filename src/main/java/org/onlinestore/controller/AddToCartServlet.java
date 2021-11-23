@@ -36,21 +36,28 @@ public class AddToCartServlet extends HttpServlet {
                 }
                 if (!cart.containsKey(item)) {
                     cart.put(item, 1);
-                    sum = ItemDao.getInstance().getItemsPrice(cart);
+                } else {
+                    Integer increase = cart.get(item);
+                    cart.replace(item, ++increase);
                 }
+                sum = ItemDao.getInstance().getItemsPrice(cart);
             } else {
                 if (unRegCart == null) {
                     unRegCart = new HashMap<>();
                     req.getSession().setAttribute("cart", unRegCart);
                 }
+
                 if (!unRegCart.containsKey(item)) {
                     unRegCart.put(item, 1);
-                    sum = ItemDao.getInstance().getItemsPrice(unRegCart);
+                } else {
+                    Integer increase = unRegCart.get(item);
+                    unRegCart.replace(item, ++increase);
                 }
+                sum = ItemDao.getInstance().getItemsPrice(unRegCart);
             }
             req.getSession().setAttribute("total", sum);
 
-            req.getRequestDispatcher("catalog").forward(req,resp);
+            req.getRequestDispatcher("catalog").forward(req, resp);
         } catch (SQLException | NamingException throwables) {
             // todo: error handling
             throwables.printStackTrace();

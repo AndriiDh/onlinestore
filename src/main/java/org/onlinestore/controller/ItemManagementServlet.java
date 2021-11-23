@@ -17,14 +17,24 @@ public class ItemManagementServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String action = req.getParameter("action");
+        int id = Integer.parseInt(req.getParameter("id"));
         try {
-            if (action.equals("edit")) {
-                ItemDao dao = ItemDao.getInstance();
-                Item item = dao.get(Integer.parseInt(req.getParameter("id")));
-                req.setAttribute("item", item);
-                req.getRequestDispatcher("new-item.jsp").forward(req, resp);
-            } else if (action.equals("new")) {
-                req.getRequestDispatcher("new-item.jsp").forward(req, resp);
+            switch (action) {
+                case "edit":
+                    ItemDao dao = ItemDao.getInstance();
+                    Item item = dao.get(id);
+                    req.setAttribute("item", item);
+                    req.getRequestDispatcher("new-item.jsp").forward(req, resp);
+                    break;
+                case "new":
+                    req.setAttribute("categories", ItemDao.CategoryDao.getInstance().getAll());
+                    req.getRequestDispatcher("new-item.jsp").forward(req, resp);
+                    break;
+                case "delete":
+                    req.setAttribute("id", id);
+                    req.setAttribute("action", "delete");
+                    req.getRequestDispatcher("confirm.jsp").forward(req,resp);
+                    return;
             }
             resp.sendRedirect("catalog");
         } catch (SQLException | NamingException throwables) {

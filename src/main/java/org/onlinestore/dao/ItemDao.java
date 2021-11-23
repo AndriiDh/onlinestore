@@ -19,7 +19,7 @@ public class ItemDao implements Dao<Item> {
 
     private static final String SQL_GET_ITEM_BY_ID = "SELECT * FROM item LEFT JOIN item_description ON id = item_description.item_id WHERE id = (?)";
     private static final String SQL_GET_ALL_ITEMS = "SELECT * FROM item LEFT JOIN item_description id ON item.id = id.item_id " +
-            "WHERE title REGEXP (?) ORDER BY %s LIMIT ? OFFSET ?";
+            "WHERE title REGEXP (?) ORDER BY %s DESC LIMIT ? OFFSET ?";
     private static final String SQL_GET_ITEMS_BY_ORDER_ID = "SELECT item_id FROM item_order WHERE order_id = (?)";
     private static final String SQL_GET_ITEM_PRICE = "SELECT price FROM item WHERE id=(?)";
     private static final String SQL_GET_ITEMS_BY_NAME = "SELECT * FROM item LEFT JOIN item_description " +
@@ -27,6 +27,7 @@ public class ItemDao implements Dao<Item> {
     private static final String SQL_INSERT_ITEM = "INSERT INTO item(title, price, image, amount, category_id, add_time) VALUE (?,?,?,?,?,?)";
     private static final String SQL_UPDATE_ITEM = "UPDATE item SET title=(?), price=(?), image=(?), amount=(?), add_time=(?), category_id=(?)" +
             "WHERE id=(?)";
+    private static final String SQL_DELETE_ITEM = "DELETE FROM item WHERE id = (?)";
     private static final int PRODUCTS_PER_PAGE = 8;
 
 
@@ -162,6 +163,17 @@ public class ItemDao implements Dao<Item> {
             return i;
         }, Collectors.counting()));
     }
+    @Override
+    public void delete(int id) throws SQLException, NamingException {
+        try (Connection connection = DBManager.getConnection();
+        PreparedStatement ps = connection.prepareStatement(SQL_DELETE_ITEM)) {
+            ps.setInt(1, id);
+            if (ps.executeUpdate() < 1) {
+                throw new SQLException("Current item doesn't exist");
+            }
+        }
+    }
+
 
     @Override
     public void insert(Item item) throws SQLException, NamingException {

@@ -30,7 +30,11 @@
             <label for="price">Price</label>
         </div>
         <div class="form-floating">
-            <input name="category" value="${requestScope.item.category}" type="text" class="form-control" id="category" placeholder="Category">
+            <select id="category" class="form-select" name="category">
+                <c:forEach var="category" items="${requestScope.categories}">
+                    <option value="${category.name}">${category.name}</option>
+                </c:forEach>
+            </select>
             <label for="category">Category</label>
         </div>
         <div class="form-floating">
@@ -51,6 +55,7 @@
         <c:if test="${not empty requestScope.item}">
             <input name="id" type="hidden" value="${requestScope.item.id}">
             <button name="action" value="new" class="w-100 btn btn-lg btn-primary" type="submit">Edit Item</button>
+            <button name="action" value="delete" class="w-100 btn btn-lg btn-primary" type="submit">Delete Item</button>
         </c:if>
         </form>
     </main>
