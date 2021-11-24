@@ -13,7 +13,7 @@
         <h3>Cabinet</h3>
         <hr/>
         <c:if test="${sessionScope.user.role eq Role.ADMIN}">
-            <button type="submit" name="Show users">Show users</button>
+            <a class="btn btn-sm btn-light" type="submit" href="users">Users</a>
             <a class="btn btn-sm btn-light" type="submit" href="itemManagement?action=new">Add products</a>
         </c:if>
         <c:if test="${sessionScope.user.role eq Role.CUSTOMER}">

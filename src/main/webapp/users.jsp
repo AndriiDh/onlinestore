@@ -1,5 +1,5 @@
+<%@ page contentType="text/html;charset=UTF-8" import="org.onlinestore.entity.Role" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
     <meta charset="utf-8">
@@ -29,19 +29,32 @@
                         <td><c:out value="${user.lastName}"/></td>
                         <td><c:out value="${user.email}"/></td>
                         <td><c:out value="${user.role}"/></td>
+                        <c:if test="${sessionScope.user.role eq Role.ADMIN}">
                         <td>
-                        <c:if test="${not user.banned}">
-                            <form action="user-orders" method="get">
+                            <form action="UserManagement" method="post">
                                 <input name="id" value="${user.id}" hidden>
-                                <input class="btn btn-danger" type="submit" value="Ban">
+                                <c:if test="${not user.banned}">
+                                    <button name="action" value="ban" type="submit" class="btn btn-danger w-auto">
+                                        Ban
+                                    </button>
+                                </c:if>
+                                <c:if test="${user.banned}">
+                                    <button name="action" value="unban" type="submit" class="btn btn-danger w-auto">
+                                        Unban
+                                    </button>
+                                </c:if>
+                                <c:if test="${user.role eq Role.CUSTOMER}">
+                                    <button name="action" value="make-manager" type="submit" class="btn btn-primary w-auto">
+                                        Make Manager
+                                    </button>
+                                </c:if>
+                                <c:if test="${user.role eq Role.MANAGER}">
+                                    <button name="action" value="make-customer" type="submit" class="btn btn-primary w-auto">
+                                        Make Customer
+                                    </button>
+                                </c:if>
                             </form>
-                        </c:if>
-                        <c:if test="${ user.banned}">
-                            <form action="user-orders" method="get">
-                                <input name="id" value="${user.id}" hidden>
-                                <input class="btn btn-danger" type="submit" value="Unban">
-                            </form>
-                        </c:if>
+                            </c:if>
                         </td>
                         <td>
                             <form action="user-orders" method="get">

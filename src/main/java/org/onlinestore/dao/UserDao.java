@@ -1,5 +1,7 @@
 package org.onlinestore.dao;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.onlinestore.entity.Role;
 import org.onlinestore.entity.User;
 
@@ -9,13 +11,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserDao implements Dao<User> {
+    private static final Logger LOG = LogManager.getLogger(UserDao.class);
     private static final String SQL_GET_USER_BY_ID = "SELECT * FROM user WHERE id = (?)";
     private static final String SQL_GET_USER_BY_LOGIN = "SELECT * FROM user WHERE login = (?)";
     private static final String SQL_GET_ALL_USERS = "SELECT * FROM user";
     private static final String SQL_INSERT_USER = "INSERT INTO user(login, first_name, last_name, user_password, email, phone, role_title, banned, available_money)" +
             "VALUE (?, ?, ?, ?, ?, ?, ?, ?, ?)";
     private static final String SQL_UPDATE_USER = "UPDATE user SET login = (?), first_name = (?), last_name = (?), " +
-            "user_password = (?), email = (?), phone = (?), role_title = (?), banne = (?) WHERE id = (?)";
+            "user_password = (?), email = (?), phone = (?), role_title = (?), banned = (?) WHERE id = (?)";
 
     private static UserDao instance;
 
@@ -140,6 +143,7 @@ public class UserDao implements Dao<User> {
             ps.setString(6, user.getPhoneNumber());
             ps.setString(7, user.getRole().getValue());
             ps.setBoolean(8, user.isBanned());
+            ps.setInt(9, user.getId());
             ps.executeUpdate();
         }
 
