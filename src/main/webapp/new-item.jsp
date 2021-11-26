@@ -55,7 +55,6 @@
         <c:if test="${not empty requestScope.item}">
             <input name="id" type="hidden" value="${requestScope.item.id}">
             <button name="action" value="new" class="w-100 btn btn-lg btn-primary" type="submit">Edit Item</button>
-            <button name="action" value="delete" class="w-100 btn btn-lg btn-primary" type="submit">Delete Item</button>
         </c:if>
         </form>
     </main>

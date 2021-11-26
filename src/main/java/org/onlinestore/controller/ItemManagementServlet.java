@@ -17,8 +17,10 @@ public class ItemManagementServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String action = req.getParameter("action");
-        int id = Integer.parseInt(req.getParameter("id"));
+        String reqId = req.getParameter("id");
+        int id = reqId != null ? Integer.parseInt(reqId) : 0;
         try {
+            req.setAttribute("categories", ItemDao.CategoryDao.getInstance().getAll());
             switch (action) {
                 case "edit":
                     ItemDao dao = ItemDao.getInstance();
@@ -27,7 +29,6 @@ public class ItemManagementServlet extends HttpServlet {
                     req.getRequestDispatcher("new-item.jsp").forward(req, resp);
                     break;
                 case "new":
-                    req.setAttribute("categories", ItemDao.CategoryDao.getInstance().getAll());
                     req.getRequestDispatcher("new-item.jsp").forward(req, resp);
                     break;
                 case "delete":

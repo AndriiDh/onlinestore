@@ -43,6 +43,7 @@ public class BuyServlet extends HttpServlet {
                 order.setStatus("registered");
                 order.setComment(req.getParameter("comment"));
                 order.setPriceOfOrder(ItemDao.getInstance().getItemsPrice(items));
+                ItemDao.getInstance().updateItems(items);
                 OrderDao.getInstance().insert(order);
             }
             user.setCart(new HashMap<>());

@@ -11,7 +11,6 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class ItemDao implements Dao<Item> {
     private static ItemDao instance;
@@ -28,6 +27,12 @@ public class ItemDao implements Dao<Item> {
     private static final String SQL_UPDATE_ITEM = "UPDATE item SET title=(?), price=(?), image=(?), amount=(?), add_time=(?), category_id=(?)" +
             "WHERE id=(?)";
     private static final String SQL_DELETE_ITEM = "DELETE FROM item WHERE id = (?)";
+    private static final String SQL_COUNT_ITEMS = "SELECT count(*) FROM item WHERE title REGEXP (?)";
+    private static final String SQL_INSERT_ITEM_DESCRIPTION = "INSERT INTO item_description(item_id, language_id, description) VALUE " +
+            "(?,?,?)";
+    private static final String SQL_UPDATE_ITEM_DESCRIPTION = "UPDATE item_description SET language_id = (?), description = (?) " +
+            "WHERE item_id = (?)";
+    private static final String SQL_GET_ITEM_DESCRIPTION = "SELECT * FROM item_description WHERE item_id = (?)";
     private static final int PRODUCTS_PER_PAGE = 8;
 
 
@@ -89,18 +94,31 @@ public class ItemDao implements Dao<Item> {
         return items;
     }
 
+    public String getItemDescription(int id) throws SQLException, NamingException {
+        try (Connection connection = DBManager.getConnection();
+             PreparedStatement ps = connection.prepareStatement(SQL_GET_ITEM_DESCRIPTION)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString(3);
+                }
+            }
+        }
+        return null;
+    }
+
     @Override
     public List<Item> getAll() {
         throw new UnsupportedOperationException();
     }
 
-    public List<Item> getAll(String query, String sort) throws SQLException, NamingException {
+    public List<Item> getAll(String query, String sort, int page) throws SQLException, NamingException {
         ArrayList<Item> items = new ArrayList<>();
         try (Connection connection = DBManager.getConnection();
              PreparedStatement ps = connection.prepareStatement(String.format(SQL_GET_ALL_ITEMS, sort))) {
             ps.setString(1, query);
             ps.setInt(2, PRODUCTS_PER_PAGE);
-            ps.setInt(3, 0);
+            ps.setInt(3, PRODUCTS_PER_PAGE * (page - 1));
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Item item = new Item();
@@ -118,6 +136,44 @@ public class ItemDao implements Dao<Item> {
         }
         return items;
     }
+
+    public int countItems(String query) throws SQLException, NamingException {
+        try (Connection connection = DBManager.getConnection();
+             PreparedStatement ps = connection.prepareStatement(SQL_COUNT_ITEMS)) {
+            ps.setString(1, query);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        }
+        return 0;
+    }
+
+    public void setItemDescription(Item item) throws SQLException, NamingException {
+        try (Connection connection = DBManager.getConnection();
+             PreparedStatement ps = connection.prepareStatement(SQL_INSERT_ITEM_DESCRIPTION)) {
+            ps.setInt(1, item.getId());
+            ps.setInt(2, 1); // I18N!!!!
+            ps.setString(3, item.getDescription());
+            if (ps.executeUpdate() < 1) {
+                LOG.error("Description wasn't inserted");
+            }
+        }
+    }
+
+    private void updateItemDescription(Item item) throws SQLException, NamingException {
+        try (Connection connection = DBManager.getConnection();
+             PreparedStatement ps = connection.prepareStatement(SQL_UPDATE_ITEM_DESCRIPTION)) {
+            ps.setInt(1, 1); // i18n !!!!
+            ps.setString(2, item.getDescription());
+            ps.setInt(3, item.getId());
+            if (ps.executeUpdate() < 1) {
+                LOG.error("Description wasn't updated");
+            }
+        }
+    }
+
 
     public BigDecimal getItemsPrice(Map<Item, Integer> list) throws SQLException, NamingException {
         BigDecimal sum = BigDecimal.ZERO;
@@ -152,21 +208,21 @@ public class ItemDao implements Dao<Item> {
         return items;
     }
 
-    public Map<Item, Long> getItemsByOrder(int orderId) throws SQLException, NamingException {
-        return getItemsId(orderId).stream().collect(Collectors.groupingBy(v -> {
-            Item i = new Item();
-            try {
-                i = ItemDao.instance.get(v);
-            } catch (SQLException | NamingException throwables) {
-                throwables.printStackTrace();
-            }
-            return i;
-        }, Collectors.counting()));
+    public void updateItems(Map<Item, Integer> items) throws NamingException, SQLException {
+        if (items == null) {
+            throw new NamingException("Given structure is null");
+        }
+        for (Map.Entry<Item, Integer> item : items.entrySet()) {
+            Item currentItem = item.getKey();
+            currentItem.setAmount(currentItem.getAmount() - item.getValue());
+            update(currentItem);
+        }
     }
+
     @Override
     public void delete(int id) throws SQLException, NamingException {
         try (Connection connection = DBManager.getConnection();
-        PreparedStatement ps = connection.prepareStatement(SQL_DELETE_ITEM)) {
+             PreparedStatement ps = connection.prepareStatement(SQL_DELETE_ITEM)) {
             ps.setInt(1, id);
             if (ps.executeUpdate() < 1) {
                 throw new SQLException("Current item doesn't exist");
@@ -181,13 +237,15 @@ public class ItemDao implements Dao<Item> {
              PreparedStatement ps = connection.prepareStatement(SQL_INSERT_ITEM)) {
             ps.setString(1, item.getTitle());
             ps.setBigDecimal(2, item.getPrice());
-            ps.setString(3,item.getImage());
+            ps.setString(3, item.getImage());
             ps.setInt(4, item.getAmount());
             ps.setInt(5, item.getCategory().getId());
             ps.setDate(6, item.getAddedAt());
             if (ps.executeUpdate() < 1) {
                 LOG.warn("Insert wasn't executed");
+                return;
             }
+            setItemDescription(item);
         }
 
     }
@@ -195,7 +253,7 @@ public class ItemDao implements Dao<Item> {
     @Override
     public void update(Item item) throws SQLException, NamingException {
         try (Connection connection = DBManager.getConnection();
-        PreparedStatement ps = connection.prepareStatement(SQL_UPDATE_ITEM)) {
+             PreparedStatement ps = connection.prepareStatement(SQL_UPDATE_ITEM)) {
             ps.setString(1, item.getTitle());
             ps.setBigDecimal(2, item.getPrice());
             ps.setString(3, item.getImage());
@@ -204,6 +262,10 @@ public class ItemDao implements Dao<Item> {
             ps.setInt(6, item.getCategory().getId());
             ps.setInt(7, item.getId());
             ps.executeUpdate();
+            if (getItemDescription(item.getId()) == null) {
+                setItemDescription(item);
+            }
+            updateItemDescription(item);
         }
     }
 

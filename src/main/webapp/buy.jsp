@@ -9,10 +9,12 @@
 <body>
 <%@ include file="header.jspf" %>
 <form name="order" action="buy" method="post">
-    <label for="comment">Comment</label>
-    <input name="comment" type="text" id="comment"/>
-    <button type="submit">Submit</button>
+    <div class="container mt-5">
+        <label for="comment">Comment</label>
+        <input name="comment" type="text" id="comment"/>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
 </form>
-<%@include file="footer.jspf"%>
+<%@include file="footer.jspf" %>
 </body>
 </html>

@@ -38,7 +38,8 @@ public class AddToCartServlet extends HttpServlet {
                     cart.put(item, 1);
                 } else {
                     Integer increase = cart.get(item);
-                    cart.replace(item, ++increase);
+                    increase = increase == item.getAmount() ? increase : ++increase;
+                    cart.replace(item, increase);
                 }
                 sum = ItemDao.getInstance().getItemsPrice(cart);
             } else {

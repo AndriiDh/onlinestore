@@ -84,6 +84,17 @@
             </div>
                 </c:forEach>
         </div>
+        <nav>
+            <ul class="pagination justify-content-center">
+                <c:forEach var="i" begin="${1}" end="${requestScope.amount_of_items}">
+                    <li class="page-item">
+                        <a class="page-link" href="catalog?q=${param.q}&search-by=${param['search-by']}&sort-by=${param['sort-by']}&page=${i}">
+                            <c:out value="${i}"/>
+                        </a>
+                    </li>
+                </c:forEach>
+            </ul>
+        </nav>
     </div>
 </main>
 <%@include file="footer.jspf"%>

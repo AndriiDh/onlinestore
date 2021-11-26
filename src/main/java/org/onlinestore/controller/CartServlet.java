@@ -38,7 +38,8 @@ public class CartServlet extends HttpServlet {
                     break;
                 case "increase":
                     Integer increase = cartItems.get(item);
-                    cartItems.replace(item, ++increase);
+                    increase = increase == item.getAmount() ? increase : ++increase;
+                    cartItems.replace(item, increase);
                     break;
                 case "decrease":
                     Integer decrease = cartItems.get(item);
