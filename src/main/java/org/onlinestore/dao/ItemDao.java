@@ -234,14 +234,20 @@ public class ItemDao implements Dao<Item> {
     @Override
     public void insert(Item item) throws SQLException, NamingException {
         try (Connection connection = DBManager.getConnection();
-             PreparedStatement ps = connection.prepareStatement(SQL_INSERT_ITEM)) {
+             PreparedStatement ps = connection.prepareStatement(SQL_INSERT_ITEM, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, item.getTitle());
             ps.setBigDecimal(2, item.getPrice());
             ps.setString(3, item.getImage());
             ps.setInt(4, item.getAmount());
             ps.setInt(5, item.getCategory().getId());
             ps.setDate(6, item.getAddedAt());
-            if (ps.executeUpdate() < 1) {
+            if (ps.executeUpdate() > 0) {
+                try (ResultSet set = ps.getGeneratedKeys()) {
+                    if (set.next()) {
+                        item.setId(set.getInt(1));
+                    }
+                }
+            } else {
                 LOG.warn("Insert wasn't executed");
                 return;
             }

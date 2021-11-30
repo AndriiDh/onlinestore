@@ -1,7 +1,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="Container">
-        <a class="navbar-brand" href="catalog">Online Store</a>
+        <a class="navbar-brand" href="catalog"><fmt:message key="header.label"/></a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -10,25 +10,31 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav ms-md-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="cart.jsp">Cart</a>
+                    <a class="nav-link" href="cart.jsp"><fmt:message key="header.label.cart"/></a>
                 </li>
                 <c:if test="${empty sessionScope.user}">
                     <li class="nav-item active">
-                        <a class="nav-link" href="login">Login</a>
+                        <a class="nav-link" href="login"><fmt:message key="header.label.login"/></a>
                     </li>
                     <li class="nav-item active">
-                        <a class="nav-link" href="signup">Sign up</a>
+                        <a class="nav-link" href="signup"><fmt:message key="header.label.sign-up"/></a>
                     </li>
                 </c:if>
                 <c:if test="${not empty sessionScope.user}">
                     <li class="nav-item">
-                        <a class="nav-link" href="logout">Logout, <c:out value="${sessionScope.user.firstName}"/> </a>
+                        <a class="nav-link" href="logout"><fmt:message key="header.label.logout"/> <c:out value="${sessionScope.user.firstName}"/> </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="cabinet.jsp">Cabinet </a>
+                        <a class="nav-link" href="cabinet.jsp"><fmt:message key="header.label.cabinet"/></a>
                     </li>
                 </c:if>
             </ul>
+            <div class="text-end">
+                <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
+                    <a href="SetLocaleServlet?lang=uk" class="btn btn-outline-secondary">ua</a>
+                    <a href="SetLocaleServlet?lang=en" class="btn btn-outline-secondary">en</a>
+                </div>
+            </div>
         </div>
     </div>
 </nav>

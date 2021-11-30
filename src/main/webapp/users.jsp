@@ -1,9 +1,12 @@
 <%@ page contentType="text/html;charset=UTF-8" import="org.onlinestore.entity.Role" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<fmt:setLocale value="${cookie['lang'].value}"/>
+<fmt:setBundle basename="messages"/>
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Users</title>
+    <title><fmt:message key="user.label"/></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
@@ -14,12 +17,12 @@
             <table class="table table-hover">
                 <thead>
                 <tr>
-                    <th scope="col">First Name</th>
-                    <th scope="col">Last Name</th>
-                    <th scope="col">Email</th>
-                    <th scope="col">Role</th>
-                    <th scope="col">Banned</th>
-                    <th scope="col">Orders</th>
+                    <th scope="col"><fmt:message key="user.label.first-name"/></th>
+                    <th scope="col"><fmt:message key="user.label.last-name"/></th>
+                    <th scope="col"><fmt:message key="user.label.email"/></th>
+                    <th scope="col"><fmt:message key="user.label.role"/></th>
+                    <th scope="col"><fmt:message key="user.label.banned"/></th>
+                    <th scope="col"><fmt:message key="user.label.orders"/></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -35,23 +38,22 @@
                                 <input name="id" value="${user.id}" hidden>
                                 <c:if test="${not user.banned}">
                                     <button name="action" value="ban" type="submit" class="btn btn-danger w-auto">
-                                        Ban
+                                        <fmt:message key="user.label.ban"/>
                                     </button>
                                 </c:if>
                                 <c:if test="${user.banned}">
                                     <button name="action" value="unban" type="submit" class="btn btn-danger w-auto">
-                                        Unban
+                                        <fmt:message key="user.label.unban"/>
                                     </button>
                                 </c:if>
                                 <c:if test="${user.role eq Role.CUSTOMER}">
                                     <button name="action" value="make-manager" type="submit" class="btn btn-primary w-auto">
-                                        Make Manager
+                                        <fmt:message key="user.label.make-manager"/>
                                     </button>
                                 </c:if>
                                 <c:if test="${user.role eq Role.MANAGER}">
                                     <button name="action" value="make-customer" type="submit" class="btn btn-primary w-auto">
-                                        Make Customer
-                                    </button>
+                                        <fmt:message key="user.label.make-customer"/>                                    </button>
                                 </c:if>
                             </form>
                             </c:if>
