@@ -22,10 +22,11 @@ public class AccessFilter implements Filter {
     private static final Map<Role, List<String>> map = new EnumMap<>(Role.class);
     private static final List<String> UNAUTHORISED = Arrays.asList("cart.jsp", "catalog.jsp", "login.jsp", "signup.jsp",
             "cartProcessing", "catalog", "login", "SetLocaleServlet", "signup", "addToCart");
+
     static {
         map.put(Role.CUSTOMER, Arrays.asList("buy", "logout", "orders", "buy.jsp", "cabinet.jsp", "order.jsp"));
         map.put(Role.ADMIN, Arrays.asList("delete-servlet", "itemManagement", "newItemServlet", "UserManagement",
-                "users", "buy", "logout", "orders", "buy.jsp", "cabinet.jsp", "order.jsp"));
+                "users", "buy", "logout", "orders", "buy.jsp", "cabinet.jsp", "order.jsp", "order-management"));
     }
 
     @Override
@@ -38,6 +39,10 @@ public class AccessFilter implements Filter {
         if (!(source.endsWith(".css") || source.endsWith(".jpg"))) {
             User user = (User) httpRequest.getSession().getAttribute("user");
             if (user != null) {
+                if (user.isBanned()) {
+                    request.setAttribute("Ban", true);
+                    request.getRequestDispatcher("error.jsp").forward(request, response);
+                }
                 if (!(map.get(user.getRole()).contains(source) || UNAUTHORISED.contains(source))) {
                     httpResponse.sendRedirect("catalog");
                     return;
