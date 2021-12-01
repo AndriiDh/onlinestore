@@ -16,9 +16,9 @@ public class ItemDao implements Dao<Item> {
     private static ItemDao instance;
     private static final Logger LOG = LogManager.getLogger(ItemDao.class);
 
-    private static final String SQL_GET_ITEM_BY_ID = "SELECT * FROM item LEFT JOIN item_description ON id = item_description.item_id WHERE id = (?)";
+    private static final String SQL_GET_ITEM_BY_ID = "SELECT * FROM item LEFT JOIN item_description ON id = item_description.item_id WHERE language_id = (?) AND id = (?)";
     private static final String SQL_GET_ALL_ITEMS = "SELECT * FROM item LEFT JOIN item_description id ON item.id = id.item_id " +
-            "WHERE title REGEXP (?) ORDER BY %s DESC LIMIT ? OFFSET ?";
+            "WHERE language_id=(?) AND title REGEXP (?) ORDER BY %s DESC LIMIT ? OFFSET ?";
     private static final String SQL_GET_ITEMS_BY_ORDER_ID = "SELECT item_id FROM item_order WHERE order_id = (?)";
     private static final String SQL_GET_ITEM_PRICE = "SELECT price FROM item WHERE id=(?)";
     private static final String SQL_GET_ITEMS_BY_NAME = "SELECT * FROM item LEFT JOIN item_description " +
@@ -32,7 +32,7 @@ public class ItemDao implements Dao<Item> {
             "(?,?,?)";
     private static final String SQL_UPDATE_ITEM_DESCRIPTION = "UPDATE item_description SET language_id = (?), description = (?) " +
             "WHERE item_id = (?)";
-    private static final String SQL_GET_ITEM_DESCRIPTION = "SELECT * FROM item_description WHERE item_id = (?)";
+    private static final String SQL_GET_ITEM_DESCRIPTION = "SELECT * FROM item_description WHERE language_id=(?) AND item_id = (?)";
     private static final int PRODUCTS_PER_PAGE = 8;
 
 
@@ -46,14 +46,18 @@ public class ItemDao implements Dao<Item> {
         }
         return instance;
     }
-
     @Override
-    public Item get(int id) throws SQLException, NamingException {
+    public Item get(int id) {
+        throw new UnsupportedOperationException();
+    }
+
+    public Item get(int id, int lang) throws SQLException, NamingException {
         Item item = null;
         CategoryDao cd = CategoryDao.getInstance();
         try (Connection connection = DBManager.getConnection();
              PreparedStatement ps = connection.prepareStatement(SQL_GET_ITEM_BY_ID)) {
-            ps.setInt(1, id);
+            ps.setInt(1, lang);
+            ps.setInt(2, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     item = new Item();
@@ -94,10 +98,11 @@ public class ItemDao implements Dao<Item> {
         return items;
     }
 
-    public String getItemDescription(int id) throws SQLException, NamingException {
+    public String getItemDescription(int id, String lang) throws SQLException, NamingException {
         try (Connection connection = DBManager.getConnection();
              PreparedStatement ps = connection.prepareStatement(SQL_GET_ITEM_DESCRIPTION)) {
-            ps.setInt(1, id);
+            ps.setString(1, lang);
+            ps.setInt(2, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return rs.getString(3);
@@ -112,13 +117,14 @@ public class ItemDao implements Dao<Item> {
         throw new UnsupportedOperationException();
     }
 
-    public List<Item> getAll(String query, String sort, int page) throws SQLException, NamingException {
+    public List<Item> getAll(String query, String sort, int page, String lang) throws SQLException, NamingException {
         ArrayList<Item> items = new ArrayList<>();
         try (Connection connection = DBManager.getConnection();
              PreparedStatement ps = connection.prepareStatement(String.format(SQL_GET_ALL_ITEMS, sort))) {
-            ps.setString(1, query);
-            ps.setInt(2, PRODUCTS_PER_PAGE);
-            ps.setInt(3, PRODUCTS_PER_PAGE * (page - 1));
+            ps.setString(1, lang);
+            ps.setString(2, query);
+            ps.setInt(3, PRODUCTS_PER_PAGE);
+            ps.setInt(4, PRODUCTS_PER_PAGE * (page - 1));
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Item item = new Item();
@@ -255,9 +261,12 @@ public class ItemDao implements Dao<Item> {
         }
 
     }
-
     @Override
-    public void update(Item item) throws SQLException, NamingException {
+    public void update(Item item) {
+        throw new UnsupportedOperationException();
+    }
+
+    public void update(Item item, String lang) throws SQLException, NamingException {
         try (Connection connection = DBManager.getConnection();
              PreparedStatement ps = connection.prepareStatement(SQL_UPDATE_ITEM)) {
             ps.setString(1, item.getTitle());
@@ -268,7 +277,7 @@ public class ItemDao implements Dao<Item> {
             ps.setInt(6, item.getCategory().getId());
             ps.setInt(7, item.getId());
             ps.executeUpdate();
-            if (getItemDescription(item.getId()) == null) {
+            if (getItemDescription(item.getId(), lang) == null) {
                 setItemDescription(item);
             }
             updateItemDescription(item);

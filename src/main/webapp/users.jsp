@@ -59,9 +59,9 @@
                             </c:if>
                         </td>
                         <td>
-                            <form action="user-orders" method="get">
-                                <input name="id" value="${user.id}" hidden>
-                                <input class="btn btn-primary" type="submit" value="Orders">
+                            <form action="orders" method="get">
+                                <input name="userId" value="${user.id}" hidden>
+                                <input class="btn btn-primary" type="submit" value=<fmt:message key="user.label.orders"/>>
                             </form>
                         </td>
                     </tr>

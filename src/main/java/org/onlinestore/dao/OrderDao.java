@@ -20,8 +20,7 @@ public class OrderDao implements Dao<Order> {
     private static final String SQL_GET_ALL_ORDERS = "SELECT * FROM bill";
     private static final String SQL_GET_ALL_USER_ORDERS = "SELECT * FROM bill WHERE user_id=(?)";
     private static final String SQL_INSERT_ORDER = "INSERT INTO bill(user_id, order_price, status, comment) VALUE (?, ?, ?, ?)";
-    private static final String SQL_UPDATE_ORDER = "UPDATE bill SET user_id = (?), " +
-            "order_price = (?), status = (?), comment(?) WHERE id = (?)";
+    private static final String SQL_UPDATE_ORDER = "UPDATE bill SET user_id = (?), order_price = (?), status = (?), comment=(?) WHERE id = (?)";
     private static final String SQL_INSERT_ITEMS_ORDERS = "INSERT INTO item_order(item_id, order_id, count) VALUE (?,?,?)";
     private static final String SQL_GET_ITEMS_TO_ORDER = "SELECT item_id, count FROM item_order WHERE order_id = (?)";
     private static final String SQL_GET_USER_CART = "SELECT id FROM bill WHERE user_id = (?) AND status = 'cart'";
@@ -141,7 +140,7 @@ public class OrderDao implements Dao<Order> {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    items.put(ItemDao.getInstance().get(rs.getInt(1)), rs.getInt(2));
+                    items.put(ItemDao.getInstance().get(rs.getInt(1), 1), rs.getInt(2));
                 }
             }
         }
@@ -160,15 +159,15 @@ public class OrderDao implements Dao<Order> {
         }
         return -1;
     }
-
     @Override
     public void update(Order order) throws SQLException, NamingException {
         try (Connection connection = DBManager.getConnection();
-             PreparedStatement ps = connection.prepareStatement(SQL_INSERT_ORDER)) {
+             PreparedStatement ps = connection.prepareStatement(SQL_UPDATE_ORDER)) {
             ps.setInt(1, order.getUser().getId());
             ps.setBigDecimal(2, order.getPriceOfOrder());
             ps.setString(3, order.getStatus());
             ps.setString(4, order.getComment());
+            ps.setInt(5, order.getId());
             ps.executeUpdate();
         }
     }

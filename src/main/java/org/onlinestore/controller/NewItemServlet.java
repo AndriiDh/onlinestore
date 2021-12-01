@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -64,7 +65,7 @@ public class NewItemServlet extends HttpServlet {
                        .setCategory(categoryToInsert)
                        .setAddedAt(new Date(System.currentTimeMillis()));
                System.out.println(item);
-               dao.update(item);
+               dao.update(item, Arrays.stream(req.getCookies()).filter(s -> s.getName().equals("lang_id")).findAny().get().getValue());
            }
            resp.sendRedirect("catalog");
        } catch (SQLException | NamingException throwables) {

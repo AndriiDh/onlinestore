@@ -15,6 +15,7 @@ public class SetLocaleServlet extends HttpServlet {
         String lang = req.getParameter("lang");
         lang = lang == null ? "en" : lang;
         resp.addCookie(new Cookie("lang", lang));
+        resp.addCookie(new Cookie("lang_id", lang.equals("en") ? "1" : "2"));
         resp.sendRedirect(req.getHeader("Referer"));
     }
 
