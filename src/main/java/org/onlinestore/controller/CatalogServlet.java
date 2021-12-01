@@ -26,13 +26,16 @@ public class CatalogServlet extends HttpServlet {
         String query = req.getParameter("q");
         String sortBy = req.getParameter("sort-by");
         String page = req.getParameter("page");
-
+        String lang = Arrays.stream(req.getCookies()).filter(s -> s.getName().equals("lang_id"))
+                .findAny()
+                .get()
+                .getValue();
         query = query == null || query.isEmpty() ? "." : query;
         sortBy = sort.contains(sortBy) ? sortBy : "title";
 
         try {
             log.info("DoGet Method is executed");
-            List<Item> items = getItems(query, sortBy, page);
+            List<Item> items = getItems(query, sortBy, page, lang);
 
             req.setAttribute("items", items);
             req.setAttribute("amount_of_items", countPages(query));
@@ -43,14 +46,14 @@ public class CatalogServlet extends HttpServlet {
         }
     }
 
-    private static List<Item> getItems(String query, String sortBy, String page) throws SQLException, NamingException {
+    private static List<Item> getItems(String query, String sortBy, String page, String lang) throws SQLException, NamingException {
         int pageToGo;
         try {
             pageToGo = Integer.parseInt(page);
         } catch (NumberFormatException e) {
             pageToGo = 1;
         }
-        return ItemDao.getInstance().getAll(query, sortBy, pageToGo);
+        return ItemDao.getInstance().getAll(query, sortBy, pageToGo, lang);
     }
 
     private static int countPages(String query) throws SQLException, NamingException {
