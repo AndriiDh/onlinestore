@@ -1,5 +1,7 @@
 package org.onlinestore.controller;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.onlinestore.dao.ItemDao;
 import org.onlinestore.entity.Item;
 import org.onlinestore.entity.Order;
@@ -18,6 +20,7 @@ import java.util.Map;
 
 @WebServlet("/cartProcessing")
 public class CartServlet extends HttpServlet {
+    private static final Logger LOG = LogManager.getLogger(CartServlet.class);
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String action = req.getParameter("action");
@@ -49,8 +52,8 @@ public class CartServlet extends HttpServlet {
             }
             sum = ItemDao.getInstance().getItemsPrice(cartItems);
         } catch (SQLException | NamingException e) {
-            // errors
-            e.printStackTrace();
+            LOG.error("Cannot manage with cart", e);
+            resp.sendRedirect("error.jsp");
         }
         req.getSession().setAttribute("total", sum);
         resp.sendRedirect("cart.jsp");

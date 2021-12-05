@@ -23,7 +23,8 @@ public class UsersServlet extends HttpServlet {
             req.setAttribute("users_list", UserDao.getInstance().getAll());
             req.getRequestDispatcher("users.jsp").forward(req,resp);
         } catch (SQLException | NamingException throwables) {
-            throwables.printStackTrace();
+            LOG.error("Cannot get users", throwables);
+            resp.sendRedirect("error.jsp");
         }
     }
 

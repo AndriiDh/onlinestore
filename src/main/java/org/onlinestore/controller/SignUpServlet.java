@@ -28,7 +28,6 @@ public class SignUpServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         User user = new User();
-        // todo : Validation : already in use login!
         user.setLogin(req.getParameter("login"));
         user.setFirstName(req.getParameter("first_name"));
         user.setLastName(req.getParameter("last_name"));
@@ -44,6 +43,7 @@ public class SignUpServlet extends HttpServlet {
             resp.sendRedirect("catalog");
         } catch (SQLException | NamingException throwables) {
             log.error("User wasn't inserted", throwables);
+            resp.sendRedirect("error.jsp");
         }
     }
 }

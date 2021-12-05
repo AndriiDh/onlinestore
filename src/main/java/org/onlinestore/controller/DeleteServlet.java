@@ -1,5 +1,7 @@
 package org.onlinestore.controller;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.onlinestore.dao.ItemDao;
 
 import javax.naming.NamingException;
@@ -13,6 +15,7 @@ import java.sql.SQLException;
 
 @WebServlet("/delete-servlet")
 public class DeleteServlet extends HttpServlet {
+    private static final Logger LOG = LogManager.getLogger(DeleteServlet.class);
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.getRequestDispatcher("catalog").forward(req,resp);
@@ -24,8 +27,8 @@ public class DeleteServlet extends HttpServlet {
         try {
             ItemDao.getInstance().delete(id);
         } catch (SQLException | NamingException throwables) {
-            //error handling
-            throwables.printStackTrace();
+            LOG.error("Problems while deleting", throwables);
+            resp.sendRedirect("error.jsp");
         }
         resp.sendRedirect("catalog");
     }

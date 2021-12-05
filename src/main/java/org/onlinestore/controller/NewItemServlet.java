@@ -1,5 +1,7 @@
 package org.onlinestore.controller;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.onlinestore.dao.ItemDao;
 import org.onlinestore.entity.Category;
 import org.onlinestore.entity.Item;
@@ -21,6 +23,7 @@ import java.util.Optional;
 
 @WebServlet("/newItemServlet")
 public class NewItemServlet extends HttpServlet {
+    private static final Logger LOG = LogManager.getLogger(NewItemServlet.class);
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.getRequestDispatcher("catalog").forward(req,resp);
@@ -73,7 +76,8 @@ public class NewItemServlet extends HttpServlet {
            }
            resp.sendRedirect("catalog");
        } catch (SQLException | NamingException throwables) {
-            throwables.printStackTrace();
+           LOG.error("Cannot add new item", throwables);
+           resp.sendRedirect("error.jsp");
         }
     }
 }

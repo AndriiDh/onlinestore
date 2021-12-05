@@ -1,5 +1,7 @@
 package org.onlinestore.controller;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.onlinestore.dao.OrderDao;
 import org.onlinestore.entity.Order;
 import org.onlinestore.entity.User;
@@ -16,6 +18,7 @@ import java.sql.SQLException;
 
 @WebServlet("/logout")
 public class LogOutServlet extends HttpServlet {
+    private static final Logger LOG = LogManager.getLogger(LogOutServlet.class);
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         User user = (User) req.getSession().getAttribute("user");
@@ -29,7 +32,8 @@ public class LogOutServlet extends HttpServlet {
                 OrderDao.getInstance().insert(order);
             }
         } catch (NamingException | SQLException e) {
-            //todo : error handling
+            LOG.error("Cannot perform logout", e);
+            resp.sendRedirect("error.jsp");
         }
         req.getSession().invalidate();
         resp.sendRedirect("catalog");

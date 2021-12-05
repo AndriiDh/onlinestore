@@ -49,6 +49,7 @@ public class UserManagementServlet extends HttpServlet  {
             resp.sendRedirect("users");
         } catch (SQLException | NamingException throwables) {
             LOG.error("Can't update user", throwables);
+            resp.sendRedirect("error.jsp");
         }
     }
 }

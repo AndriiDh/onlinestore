@@ -12,16 +12,14 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.swing.text.html.Option;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 @WebServlet("/catalog")
 public class CatalogServlet extends HttpServlet {
-    public static final Logger log = LogManager.getLogger(CatalogServlet.class);
+    private static final Logger log = LogManager.getLogger(CatalogServlet.class);
     private static final List<String> sort = Arrays.asList("title", "name", "add_time", "price");
 
     @Override
@@ -46,6 +44,7 @@ public class CatalogServlet extends HttpServlet {
             req.getRequestDispatcher("catalog.jsp").forward(req, resp);
         } catch (SQLException | NamingException throwables) {
             log.warn("Troubles with ItemDao", throwables);
+            resp.sendRedirect("error.jsp");
         }
     }
 

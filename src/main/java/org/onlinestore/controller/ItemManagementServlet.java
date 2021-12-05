@@ -1,5 +1,7 @@
 package org.onlinestore.controller;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.onlinestore.dao.ItemDao;
 import org.onlinestore.entity.Item;
 
@@ -16,6 +18,7 @@ import java.util.Arrays;
 
 @WebServlet("/itemManagement")
 public class ItemManagementServlet extends HttpServlet {
+    private static final Logger LOG = LogManager.getLogger(ItemManagementServlet.class);
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String action = req.getParameter("action");
@@ -45,8 +48,8 @@ public class ItemManagementServlet extends HttpServlet {
             }
             resp.sendRedirect("catalog");
         } catch (SQLException | NamingException throwables) {
-            // todo: errors handling
-            throwables.printStackTrace();
+            LOG.error("Problems while managing items", throwables);
+            resp.sendRedirect("error.jsp");
         }
     }
 }

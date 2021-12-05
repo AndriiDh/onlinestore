@@ -21,7 +21,7 @@ public class AccessFilter implements Filter {
 
     private static final Map<Role, List<String>> map = new EnumMap<>(Role.class);
     private static final List<String> UNAUTHORISED = Arrays.asList("cart.jsp", "catalog.jsp", "login.jsp", "signup.jsp",
-            "cartProcessing", "catalog", "login", "SetLocaleServlet", "signup", "addToCart");
+            "cartProcessing", "catalog", "login", "SetLocaleServlet", "signup", "addToCart", "error.jsp");
 
     static {
         map.put(Role.CUSTOMER, Arrays.asList("buy", "logout", "orders", "buy.jsp", "cabinet.jsp", "order.jsp"));

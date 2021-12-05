@@ -62,9 +62,8 @@ public class LoginServlet extends HttpServlet {
             }
 
         } catch (SQLException | NamingException throwables) {
-            // todo : error handling
-            LOGGER.error("Can`t process data");
-            throwables.printStackTrace();
+            LOGGER.error("Can`t process data with logining", throwables);
+            resp.sendRedirect("error.jsp");
         }
     }
 

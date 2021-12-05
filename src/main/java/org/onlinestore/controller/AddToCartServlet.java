@@ -1,5 +1,7 @@
 package org.onlinestore.controller;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.onlinestore.dao.ItemDao;
 import org.onlinestore.entity.Item;
 import org.onlinestore.entity.User;
@@ -18,13 +20,14 @@ import java.util.Map;
 
 @WebServlet("/addToCart")
 public class AddToCartServlet extends HttpServlet {
+    private static final Logger LOG = LogManager.getLogger(AddToCartServlet.class);
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
         resp.setContentType("text/html;charset=UTF-8");
         User user = (User) req.getSession().getAttribute("user");
         Map<Item, Integer> cart;
         Map<Item, Integer> unRegCart = (Map<Item, Integer>) req.getSession().getAttribute("cart");
-        BigDecimal sum = BigDecimal.ZERO;
+        BigDecimal sum;
 
         try {
             Item item = ItemDao.getInstance().get(Integer.parseInt(req.getParameter("id")),1);
@@ -60,8 +63,8 @@ public class AddToCartServlet extends HttpServlet {
 
             req.getRequestDispatcher("catalog").forward(req, resp);
         } catch (SQLException | NamingException throwables) {
-            // todo: error handling
-            throwables.printStackTrace();
+            LOG.error("Item cannot be added to a cart", throwables);
+            resp.sendRedirect("error.jsp");
         }
     }
 }

@@ -1,5 +1,7 @@
 package org.onlinestore.controller;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.onlinestore.dao.ItemDao;
 import org.onlinestore.dao.OrderDao;
 import org.onlinestore.entity.Item;
@@ -19,6 +21,7 @@ import java.util.Map;
 
 @WebServlet("/buy")
 public class BuyServlet extends HttpServlet {
+    private static final Logger LOG = LogManager.getLogger(BuyServlet.class);
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.getRequestDispatcher("catalog").forward(req,resp);
@@ -49,7 +52,8 @@ public class BuyServlet extends HttpServlet {
             req.getSession().removeAttribute("total");
             resp.sendRedirect("catalog");
         } catch (SQLException | NamingException throwables) {
-            throwables.printStackTrace();
+            LOG.error("Purchase cannot be done", throwables);
+            resp.sendRedirect("error.jsp");
         }
     }
 }
