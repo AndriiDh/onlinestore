@@ -27,6 +27,7 @@ public class BuyServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
+        String lang = "1";
         User user = (User) req.getSession().getAttribute("user");
         if (user == null) {
             resp.sendRedirect("catalog");
@@ -41,7 +42,7 @@ public class BuyServlet extends HttpServlet {
                 order.setStatus("registered");
                 order.setComment(req.getParameter("comment"));
                 order.setPriceOfOrder(ItemDao.getInstance().getItemsPrice(items));
-                ItemDao.getInstance().updateItems(items);
+                ItemDao.getInstance().updateItems(items, lang);
                 OrderDao.getInstance().insert(order);
             }
             user.setCart(new HashMap<>());

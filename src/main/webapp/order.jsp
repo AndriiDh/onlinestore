@@ -17,12 +17,9 @@
             <thead>
             <tr>
                 <th scope="col"><fmt:message key="order.label.id"/></th>
-                <%--     <th scope="col"><fmt:message key="order.label.name"/></th>
-                     <th scope="col"><fmt:message key="order.label.category"/></th>
-                     <th scope="col"><fmt:message key="order.label.amount"/></th>
-                     <th scope="col"><fmt:message key="order.label.item-price"/></th> --%>
                 <th scope="col"><fmt:message key="order.label.status"/></th>
                 <th scope="col"><fmt:message key="order.label.price"/></th>
+                <th scope="col"><fmt:message key="order.label.items"/></th>
                 <c:if test="${sessionScope.user.role eq Role.ADMIN}">
                     <th scope="col"><fmt:message key="order.label.change-status"/></th>
                 </c:if>
@@ -33,14 +30,13 @@
             <c:forEach items="${requestScope.orders}" var="order">
             <tr>
                 <td><c:out value="${order.id}"/></td>
-                    <%--    <c:forEach items="${order.items.entrySet()}" var="item">
-                                <td><c:out value="${item.key.title}"/></td>
-                                <td><c:out value="${item.key.category.name}"/></td>
-                                <td><c:out value="${item.value}"/></td>
-                                <td><c:out value="${item.key.price.multiply(item.value)}"/></td>
-                        </c:forEach> --%>
                 <td><c:out value="${order.status}"/></td>
                 <td><c:out value="${order.priceOfOrder}"/></td>
+                <td>
+                    <input type="hidden" value="${order.items}" name="items">
+                    <a class="text-center btn btn-lg btn-primary mt-3" href="item.jsp">
+                    <fmt:message key="order.label.items"/></a>
+                </td>
                 <td>
                     <c:if test="${sessionScope.user.role eq Role.ADMIN}">
                         <form method="post" action="order-management">

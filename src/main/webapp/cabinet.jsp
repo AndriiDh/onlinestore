@@ -19,12 +19,10 @@
             <a class="btn btn-sm btn-light" type="submit" href="users"><fmt:message key="cabinet.label.users"/></a>
             <a class="btn btn-sm btn-light" type="submit" href="itemManagement?action=new"><fmt:message key="cabinet.label.add-product"/></a>
         </c:if>
-        <c:if test="${sessionScope.user.role eq Role.CUSTOMER}">
-            <button type="submit" name="Edit profile"><fmt:message key="cabinet.label.edit"/></button>
+            <button class="btn btn-sm btn-light" type="submit" name="Edit profile"><fmt:message key="cabinet.label.edit"/></button>
             <a href='orders?userId=<c:out value="${sessionScope.user.id}"/>'>
-                <button type="submit" name="Orders"><fmt:message key="cabinet.label.show-orders"/></button>
+                <button class="btn btn-sm btn-light" type="submit" name="Orders"><fmt:message key="cabinet.label.show-orders"/></button>
             </a>
-        </c:if>
     </div>
     <%@include file="footer.jspf"%>
 </body>

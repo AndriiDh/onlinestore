@@ -31,7 +31,7 @@ public class CartServlet extends HttpServlet {
             cartItems = user.getCart();
         }
         try {
-            Item item = ItemDao.getInstance().get(id);
+            Item item = ItemDao.getInstance().get(id, 1);
             switch (action) {
                 case "delete":
                     cartItems.remove(item);

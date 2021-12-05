@@ -8,13 +8,16 @@ import org.onlinestore.entity.Item;
 import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.swing.text.html.Option;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 @WebServlet("/catalog")
 public class CatalogServlet extends HttpServlet {
@@ -26,10 +29,10 @@ public class CatalogServlet extends HttpServlet {
         String query = req.getParameter("q");
         String sortBy = req.getParameter("sort-by");
         String page = req.getParameter("page");
-        String lang = Arrays.stream(req.getCookies()).filter(s -> s.getName().equals("lang_id"))
+        Cookie l = Arrays.stream(req.getCookies()).filter(s -> s.getName().equals("lang_id"))
                 .findAny()
-                .get()
-                .getValue();
+                .orElse(null);
+        String lang = l == null ? "en" : l.getValue();
         query = query == null || query.isEmpty() ? "." : query;
         sortBy = sort.contains(sortBy) ? sortBy : "title";
 

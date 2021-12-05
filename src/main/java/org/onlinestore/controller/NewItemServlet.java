@@ -7,6 +7,7 @@ import org.onlinestore.entity.Item;
 import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -64,8 +65,11 @@ public class NewItemServlet extends HttpServlet {
                        .setDescription(description)
                        .setCategory(categoryToInsert)
                        .setAddedAt(new Date(System.currentTimeMillis()));
-               System.out.println(item);
-               dao.update(item, Arrays.stream(req.getCookies()).filter(s -> s.getName().equals("lang_id")).findAny().get().getValue());
+               dao.update(item, Arrays.stream(req.getCookies()).filter(s -> s.getName()
+                       .equals("lang_id"))
+                       .findAny()
+                       .orElse(new Cookie("lang_id", "en"))
+                       .getValue());
            }
            resp.sendRedirect("catalog");
        } catch (SQLException | NamingException throwables) {

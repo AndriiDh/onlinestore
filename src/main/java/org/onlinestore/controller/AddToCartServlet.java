@@ -27,7 +27,7 @@ public class AddToCartServlet extends HttpServlet {
         BigDecimal sum = BigDecimal.ZERO;
 
         try {
-            Item item = ItemDao.getInstance().get(Integer.parseInt(req.getParameter("id")));
+            Item item = ItemDao.getInstance().get(Integer.parseInt(req.getParameter("id")),1);
             if (user != null) {
                 cart = user.getCart();
                 if (unRegCart != null) {

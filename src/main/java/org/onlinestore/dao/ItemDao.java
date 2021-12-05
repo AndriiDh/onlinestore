@@ -30,8 +30,8 @@ public class ItemDao implements Dao<Item> {
     private static final String SQL_COUNT_ITEMS = "SELECT count(*) FROM item WHERE title REGEXP (?)";
     private static final String SQL_INSERT_ITEM_DESCRIPTION = "INSERT INTO item_description(item_id, language_id, description) VALUE " +
             "(?,?,?)";
-    private static final String SQL_UPDATE_ITEM_DESCRIPTION = "UPDATE item_description SET language_id = (?), description = (?) " +
-            "WHERE item_id = (?)";
+    private static final String SQL_UPDATE_ITEM_DESCRIPTION = "UPDATE item_description SET description = (?)" +
+            "WHERE item_id = (?) AND  language_id = (?)";
     private static final String SQL_GET_ITEM_DESCRIPTION = "SELECT * FROM item_description WHERE language_id=(?) AND item_id = (?)";
     private static final int PRODUCTS_PER_PAGE = 8;
 
@@ -156,11 +156,11 @@ public class ItemDao implements Dao<Item> {
         return 0;
     }
 
-    public void setItemDescription(Item item) throws SQLException, NamingException {
+    public void setItemDescription(Item item, int lang) throws SQLException, NamingException {
         try (Connection connection = DBManager.getConnection();
              PreparedStatement ps = connection.prepareStatement(SQL_INSERT_ITEM_DESCRIPTION)) {
             ps.setInt(1, item.getId());
-            ps.setInt(2, 1); // I18N!!!!
+            ps.setInt(2, lang);
             ps.setString(3, item.getDescription());
             if (ps.executeUpdate() < 1) {
                 LOG.error("Description wasn't inserted");
@@ -168,12 +168,12 @@ public class ItemDao implements Dao<Item> {
         }
     }
 
-    private void updateItemDescription(Item item) throws SQLException, NamingException {
+    private void updateItemDescription(Item item, int lang) throws SQLException, NamingException {
         try (Connection connection = DBManager.getConnection();
              PreparedStatement ps = connection.prepareStatement(SQL_UPDATE_ITEM_DESCRIPTION)) {
-            ps.setInt(1, 1); // i18n !!!!
-            ps.setString(2, item.getDescription());
-            ps.setInt(3, item.getId());
+            ps.setString(1, item.getDescription());
+            ps.setInt(2, item.getId());
+            ps.setInt(3, lang);
             if (ps.executeUpdate() < 1) {
                 LOG.error("Description wasn't updated");
             }
@@ -214,14 +214,14 @@ public class ItemDao implements Dao<Item> {
         return items;
     }
 
-    public void updateItems(Map<Item, Integer> items) throws NamingException, SQLException {
+    public void updateItems(Map<Item, Integer> items, String lang) throws NamingException, SQLException {
         if (items == null) {
             throw new NamingException("Given structure is null");
         }
         for (Map.Entry<Item, Integer> item : items.entrySet()) {
             Item currentItem = item.getKey();
             currentItem.setAmount(currentItem.getAmount() - item.getValue());
-            update(currentItem);
+            update(currentItem, lang);
         }
     }
 
@@ -257,7 +257,8 @@ public class ItemDao implements Dao<Item> {
                 LOG.warn("Insert wasn't executed");
                 return;
             }
-            setItemDescription(item);
+            setItemDescription(item, 1);
+            setItemDescription(item, 2);
         }
 
     }
@@ -278,9 +279,9 @@ public class ItemDao implements Dao<Item> {
             ps.setInt(7, item.getId());
             ps.executeUpdate();
             if (getItemDescription(item.getId(), lang) == null) {
-                setItemDescription(item);
+                setItemDescription(item, Integer.parseInt(lang));
             }
-            updateItemDescription(item);
+            updateItemDescription(item, Integer.parseInt(lang));
         }
     }
 
