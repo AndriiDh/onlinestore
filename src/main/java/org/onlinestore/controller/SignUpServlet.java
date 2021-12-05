@@ -18,8 +18,8 @@ import java.math.BigDecimal;
 import java.sql.SQLException;
 
 @WebServlet("/signup")
-public class SingUpServlet extends HttpServlet {
-    public static final Logger log = LogManager.getLogger(SingUpServlet.class);
+public class SignUpServlet extends HttpServlet {
+    public static final Logger log = LogManager.getLogger(SignUpServlet.class);
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.getRequestDispatcher("signup.jsp").forward(req,resp);
