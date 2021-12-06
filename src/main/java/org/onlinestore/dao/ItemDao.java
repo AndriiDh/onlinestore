@@ -18,7 +18,7 @@ public class ItemDao implements Dao<Item> {
 
     private static final String SQL_GET_ITEM_BY_ID = "SELECT * FROM item LEFT JOIN item_description ON id = item_description.item_id WHERE language_id = (?) AND id = (?)";
     private static final String SQL_GET_ALL_ITEMS = "SELECT * FROM item LEFT JOIN item_description id ON item.id = id.item_id " +
-            "WHERE language_id=(?) AND title REGEXP (?) ORDER BY %s DESC LIMIT ? OFFSET ?";
+            "WHERE id.language_id=(?) AND title REGEXP (?) ORDER BY %s DESC LIMIT ? OFFSET ?";
     private static final String SQL_GET_ITEMS_BY_ORDER_ID = "SELECT item_id FROM item_order WHERE order_id = (?)";
     private static final String SQL_GET_ITEM_PRICE = "SELECT price FROM item WHERE id=(?)";
     private static final String SQL_GET_ITEMS_BY_NAME = "SELECT * FROM item LEFT JOIN item_description " +

@@ -26,6 +26,7 @@ public class OrderServlet extends HttpServlet {
         try {
            orders = OrderDao.getInstance().getByUserId(id);
            req.setAttribute("orders", orders);
+           req.setAttribute("userId", userId);
            req.getRequestDispatcher("order.jsp").forward(req,resp);
         } catch (SQLException | NamingException throwables) {
             LOG.error("Cannot process order", throwables);

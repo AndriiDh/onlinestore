@@ -30,13 +30,14 @@ public class CatalogServlet extends HttpServlet {
         Cookie l = Arrays.stream(req.getCookies()).filter(s -> s.getName().equals("lang_id"))
                 .findAny()
                 .orElse(null);
-        String lang = l == null ? "en" : l.getValue();
+        String lang = l == null ? "1" : l.getValue();
         query = query == null || query.isEmpty() ? "." : query;
         sortBy = sort.contains(sortBy) ? sortBy : "title";
 
         try {
             log.info("DoGet Method is executed");
             List<Item> items = getItems(query, sortBy, page, lang);
+            System.out.println(items);
 
             req.setAttribute("items", items);
             req.setAttribute("amount_of_items", countPages(query));

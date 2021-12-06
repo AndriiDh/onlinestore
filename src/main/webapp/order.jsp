@@ -34,7 +34,7 @@
                 <td><c:out value="${order.priceOfOrder}"/></td>
                 <td>
                     <input type="hidden" value="${order.items}" name="items">
-                    <a class="text-center btn btn-lg btn-primary mt-3" href="item.jsp">
+                    <a class="text-center btn btn-lg btn-primary mt-3" href="order-management?action=show-items&id=${order.id}&userId=${requestScope.userId}">
                     <fmt:message key="order.label.items"/></a>
                 </td>
                 <td>

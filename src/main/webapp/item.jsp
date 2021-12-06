@@ -12,19 +12,27 @@
 <body>
 <main>
     <%@include file="header.jspf" %>
-    <div class="container">
-        <table class="table table-hover">
-            <thead>
-            <tr>
-                <th scope="col"><fmt:message key="order.label.id"/></th>
-                <th scope="col"><fmt:message key="order.label.status"/></th>
-                <th scope="col"><fmt:message key="order.label.price"/></th>
-                <th scope="col"><fmt:message key="order.label.items"/></th>
-                <c:if test="${sessionScope.user.role eq Role.ADMIN}">
-                    <th scope="col"><fmt:message key="order.label.change-status"/></th>
-                </c:if>
-            </tr>
-            </thead>
+<div class="container">
+    <table class="table table-light">
+    <thead>
+        <tr>
+        <th scope="col"><fmt:message key="cart.label.name"/></th>
+        <th scope="col"><fmt:message key="cart.label.category"/></th>
+        <th scope="col"><fmt:message key="cart.label.price"/></th>
+        <th scope="col"><fmt:message key="cart.label.quantity"/></th>
+        </tr>
+    </thead>
+<tbody class="text-truncate">
+    <c:forEach var="item" items="${requestScope.items.entrySet()}">
+        <tr>
+        <td><c:out value="${item.key.title}"/></td>
+        <td><c:out value="${item.key.category.name}"/></td>
+        <td><c:out value="${item.key.price}"/></td>
+        <td><c:out value="${item.value}"/></td>
+        </tr>
+    </c:forEach>
+        <a href="orders?userId=${requestScope.userId}">Back</a>
+        </tbody>
         </table>
     </div>
 </main>
